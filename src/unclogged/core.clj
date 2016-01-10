@@ -6,7 +6,7 @@
 (defn ^:private facility
   [x]
   (cond
-    (string? x) (Facility/fromLabel x)
+    (string? x) (Facility/fromLabel (.toUpperCase ^String x))
     (number? x) (Facility/fromNumericalCode x)))
 
 (defn -main
