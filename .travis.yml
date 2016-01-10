@@ -1,0 +1,15 @@
+language: clojure
+jdk:
+  - oraclejdk8
+cache:
+  directories:
+    - "$HOME/.lein"
+    - "$HOME/.m2"
+script:
+  - lein cljfmt check
+  - lein test
+  - lein uberjar
+notifications:
+  email: false
+  slack:
+    secure: EbPoeQDvkBePau87qQj4sg/TDeZHDTg+XhA3NLsnQXV1LVwGHXRiYp9FLu9XKXzs6+K73p8/fmRMS8Ac6Qec4Wuw2kmu4Ld11JhAHCF6FJsEaySJFE+yB/cQ3+XXJI0E3CsjJXv01yEOT7JMyiNKa9a5bQHykTjo9W9JHXGEZjxopvhPzdo08y2uq/yWdD+6e4L7z27diJIFpP2OG0e1iyE6A/vEo/Mh/A9/QPT0MvWJ6lRvVZL3q/DAnNc07sMnCh/lJlfcnkiHid43Wvyi6lhHO6ieHK5zqPNzu8pVy8oG5bsZ0udbJmimUgPVsdYuQKHT6B5I1HE43EGPZRqLy+nCQUGwHp1ku3WuEwd2ruLlidtR7xJ8uMgOlCG0rpRVPlf/JnJrN0X0DLd/2NJeczmxf07qWUMz8ExJoSaQFeoHIONyH/hnFVA6IaU4qYMsBBKDyfJP/uTQDFRAcBOaVXTlcppoib6sH//oN/RRgMUEKbCJRj2Bqw3GhV4MxiN9yiFwhSoWYqipvAwy6GzqEu3dsG7NDBRjIyyngb5/8DiACQqKxT9y6qcuFwMBm7fxQLyqEOA2OoGgwn08iS5gQ3FZDWBkT4Se4qkrx26BMRkgChzj9FLA1LEiGSjv91eGBnX4kAyy6mCaC3p2PrWG/pVtDIPgPhXeg9sps9A6hPY=
