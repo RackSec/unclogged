@@ -12,7 +12,7 @@
   (bit-shift-left n 3))
 
 (deftest facility-tests
-  (testing "numerical codes"
+  (testing "from numerical codes"
     (are [code facility] (= (@#'unclogged.core/facility (facility-bit-flag code))
                             facility)
       0 Facility/KERN
