@@ -7,5 +7,5 @@
 
 (deftest facility-tests
   (testing "numerical codes"
-    (are [code facility] (= (c/facility code) facility)
+    (are [code facility] (= (@#'c/facility code) facility)
       0 Facility/KERN)))
