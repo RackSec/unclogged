@@ -5,7 +5,7 @@
 
 (defn ^:private facility
   [x]
-  Facility/KERN)
+  (Facility/fromNumericalCode x))
 
 (defn -main
   "I don't do a whole lot ... yet."
