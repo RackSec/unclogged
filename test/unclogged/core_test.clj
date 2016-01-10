@@ -13,8 +13,8 @@
 
 (deftest facility-tests
   (testing "from numerical codes"
-    (are [code facility] (= (@#'unclogged.core/facility (facility-bit-flag code))
-                            facility)
+    (are [code facility] (let [flag (facility-bit-flag code)]
+                           (= facility (@#'unclogged.core/facility flag)))
       0 Facility/KERN
       1 Facility/USER
       2 Facility/MAIL
@@ -66,7 +66,7 @@
       "LOCAL6" Facility/LOCAL6
       "LOCAL7" Facility/LOCAL7))
   (testing "from lower case"
-    (are [s facility] (= (@#'unclogged.core/facility s) facility)
+    (are [s facility] (= facility (@#'unclogged.core/facility s))
       "kern" Facility/KERN
       "user" Facility/USER
       "mail" Facility/MAIL
