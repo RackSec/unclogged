@@ -130,8 +130,8 @@
       6 Severity/INFORMATIONAL
       7 Severity/DEBUG))
   (testing "from labels"
-    (are [code severity] (= severity
-                            (@#'unclogged.core/severity code))
+    (are [label severity] (= severity
+                             (@#'unclogged.core/severity label))
       "ALERT" Severity/ALERT
       "CRITICAL" Severity/CRITICAL
       "ERROR" Severity/ERROR
