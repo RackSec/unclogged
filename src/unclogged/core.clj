@@ -12,7 +12,9 @@
 
 (defn ^:private severity
   [x]
-  (Severity/fromNumericalCode x))
+  (cond
+    (string? x) (Severity/fromLabel x)
+    (number? x) (Severity/fromNumericalCode x)))
 
 (defn -main
   "I don't do a whole lot ... yet."
