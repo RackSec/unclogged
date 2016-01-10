@@ -1,5 +1,7 @@
 # unclogged
 
+[![Build Status](https://travis-ci.org/RackSec/unclogged.svg?branch=master)](https://travis-ci.org/RackSec/unclogged)
+
 Easy, performant syslog for Clojure, exposed as a [manifold][manifold]
 stream. Supports [RFC 3164][RFC3164] (classic BSD syslog), and the
 [RFC5424][RFC5424] compliant [RFC 5426][RFC5426] (syslog over UDP) and
