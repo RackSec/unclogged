@@ -3,7 +3,7 @@
    [clojure.test :as t :refer [deftest testing is are]]
    [unclogged.core :as c])
   (:import
-   [com.cloudbees.syslog Facility]))
+   [com.cloudbees.syslog Facility Severity]))
 
 (defn facility-bit-flag
   "In syslog, facilities don't use the lowest 2 bits; they're ints
@@ -117,3 +117,14 @@
       :locaL5 Facility/LOCAL5
       :locaL6 Facility/LOCAL6
       :locaL7 Facility/LOCAL7)))
+
+(deftest severity-tests
+  (are [code severity] (= severity
+                          (@#'unclogged.core/severity code))
+    1 Severity/ALERT
+    2 Severity/CRITICAL
+    3 Severity/ERROR
+    4 Severity/WARNING
+    5 Severity/NOTICE
+    6 Severity/INFORMATIONAL
+    7 Severity/DEBUG))
