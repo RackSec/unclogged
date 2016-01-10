@@ -10,12 +10,18 @@
     (string? x) (Facility/fromLabel (.toUpperCase ^String x))
     (number? x) (Facility/fromNumericalCode x)))
 
+(def ^:private severity-aliases
+  {"INFO" Severity/INFORMATIONAL
+   "WARN" Severity/WARNING
+   "ERR" Severity/ERROR})
+
 (defn ^:private severity
   [x]
-  (cond
-    (keyword? x) (severity (name x))
-    (string? x) (Severity/fromLabel (.toUpperCase ^String x))
-    (number? x) (Severity/fromNumericalCode x)))
+  (if (number? x)
+    (Severity/fromNumericalCode x)
+    (let [x (.toUpperCase ^String (name x))]
+      (or (get severity-aliases x)
+          (Severity/fromLabel x)))))
 
 (defn -main
   "I don't do a whole lot ... yet."
