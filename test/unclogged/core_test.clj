@@ -90,4 +90,30 @@
       "locaL4" Facility/LOCAL4
       "locaL5" Facility/LOCAL5
       "locaL6" Facility/LOCAL6
-      "locaL7" Facility/LOCAL7)))
+      "locaL7" Facility/LOCAL7))
+  (testing "from keyword"
+    (are [s facility] (= facility (@#'unclogged.core/facility s))
+      :kern Facility/KERN
+      :user Facility/USER
+      :mail Facility/MAIL
+      :daemon Facility/DAEMON
+      :auth Facility/AUTH
+      :syslog Facility/SYSLOG
+      :lpr Facility/LPR
+      :news Facility/NEWS
+      :uucp Facility/UUCP
+      :cron Facility/CRON
+      :authpriv Facility/AUTHPRIV
+      :ftp Facility/FTP
+      :ntp Facility/NTP
+      :audit Facility/AUDIT
+      :alert Facility/ALERT
+      :clock Facility/CLOCK
+      :locaL0 Facility/LOCAL0
+      :locaL1 Facility/LOCAL1
+      :locaL2 Facility/LOCAL2
+      :locaL3 Facility/LOCAL3
+      :locaL4 Facility/LOCAL4
+      :locaL5 Facility/LOCAL5
+      :locaL6 Facility/LOCAL6
+      :locaL7 Facility/LOCAL7)))
