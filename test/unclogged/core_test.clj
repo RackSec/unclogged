@@ -140,8 +140,8 @@
       "INFORMATIONAL" Severity/INFORMATIONAL
       "DEBUG" Severity/DEBUG))
   (testing "from lower case labels"
-    (are [code severity] (= severity
-                            (@#'unclogged.core/severity code))
+    (are [label severity] (= severity
+                             (@#'unclogged.core/severity label))
       "alert" Severity/ALERT
       "critical" Severity/CRITICAL
       "error" Severity/ERROR
