@@ -148,4 +148,14 @@
       "warning" Severity/WARNING
       "notice" Severity/NOTICE
       "informational" Severity/INFORMATIONAL
-      "debug" Severity/DEBUG)))
+      "debug" Severity/DEBUG))
+  (testing "from keywords"
+    (are [code severity] (= severity
+                            (@#'unclogged.core/severity code))
+      :alert Severity/ALERT
+      :critical Severity/CRITICAL
+      :error Severity/ERROR
+      :warning Severity/WARNING
+      :notice Severity/NOTICE
+      :informational Severity/INFORMATIONAL
+      :debug Severity/DEBUG)))
