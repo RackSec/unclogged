@@ -13,6 +13,7 @@
 (defn ^:private severity
   [x]
   (cond
+    (keyword? x) (severity (name x))
     (string? x) (Severity/fromLabel (.toUpperCase ^String x))
     (number? x) (Severity/fromNumericalCode x)))
 
