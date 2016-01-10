@@ -67,7 +67,7 @@
       "LOCAL7" Facility/LOCAL7))
   (testing "from lower case"
     (are [s facility] (= (@#'unclogged.core/facility s) facility)
-      "kern" facility/KERN
+      "kern" Facility/KERN
       "user" Facility/USER
       "mail" Facility/MAIL
       "daemon" Facility/DAEMON
