@@ -38,4 +38,30 @@
       20 Facility/LOCAL4
       21 Facility/LOCAL5
       22 Facility/LOCAL6
-      23 Facility/LOCAL7)))
+      23 Facility/LOCAL7))
+  (testing "from strings"
+    (are [s facility] (= (@#'unclogged.core/facility s) facility)
+      "KERN" Facility/KERN
+      "USER" Facility/USER
+      "MAIL" Facility/MAIL
+      "DAEMON" Facility/DAEMON
+      "AUTH" Facility/AUTH
+      "SYSLOG" Facility/SYSLOG
+      "LPR" Facility/LPR
+      "NEWS" Facility/NEWS
+      "UUCP" Facility/UUCP
+      "CRON" Facility/CRON
+      "AUTHPRIV" Facility/AUTHPRIV
+      "FTP" Facility/FTP
+      "NTP "Facility/NTP
+      "AUDIT" Facility/AUDIT
+      "ALERT" Facility/ALERT
+      "CLOCK" Facility/CLOCK
+      "LOCAL0" Facility/LOCAL0
+      "LOCAL1" Facility/LOCAL1
+      "LOCAL2" Facility/LOCAL2
+      "LOCAL3" Facility/LOCAL3
+      "LOCAL4" Facility/LOCAL4
+      "LOCAL5" Facility/LOCAL5
+      "LOCAL6" Facility/LOCAL6
+      "LOCAL7" Facility/LOCAL7)))
