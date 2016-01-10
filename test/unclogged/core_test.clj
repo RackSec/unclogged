@@ -150,8 +150,8 @@
       "informational" Severity/INFORMATIONAL
       "debug" Severity/DEBUG))
   (testing "from keywords"
-    (are [code severity] (= severity
-                            (@#'unclogged.core/severity code))
+    (are [kw severity] (= severity
+                          (@#'unclogged.core/severity kw))
       :alert Severity/ALERT
       :critical Severity/CRITICAL
       :error Severity/ERROR
