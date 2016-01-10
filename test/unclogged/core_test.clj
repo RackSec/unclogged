@@ -53,7 +53,7 @@
       "CRON" Facility/CRON
       "AUTHPRIV" Facility/AUTHPRIV
       "FTP" Facility/FTP
-      "NTP "Facility/NTP
+      "NTP" Facility/NTP
       "AUDIT" Facility/AUDIT
       "ALERT" Facility/ALERT
       "CLOCK" Facility/CLOCK
