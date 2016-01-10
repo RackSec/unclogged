@@ -16,6 +16,7 @@ asynchronous programs, including [`core.async`][coreasync].
 [RFC5424]: http://tools.ietf.org/html/rfc5424
 [RFC5426]: http://tools.ietf.org/html/rfc5426
 [RFC6587]: http://tools.ietf.org/html/rfc5426
+[coreasync]: https://github.com/clojure/core.async
 
 ## Usage
 
