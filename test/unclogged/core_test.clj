@@ -158,4 +158,14 @@
       :warning Severity/WARNING
       :notice Severity/NOTICE
       :informational Severity/INFORMATIONAL
-      :debug Severity/DEBUG)))
+      :debug Severity/DEBUG))
+  (testing "from aliases"
+    (are [sev-alias severity] (let [as-str (name sev-alias)
+                                    upper-case (.toUpperCase ^String as-str)]
+                                (= severity
+                                   (@#'unclogged.core/severity sev-alias)
+                                   (@#'unclogged.core/severity as-str)
+                                   (@#'unclogged.core/severity upper-case)))
+      :info Severity/INFORMATIONAL
+      :err Severity/ERROR
+      :warn Severity/WARNING)))
