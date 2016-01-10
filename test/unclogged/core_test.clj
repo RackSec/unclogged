@@ -39,7 +39,7 @@
       21 Facility/LOCAL5
       22 Facility/LOCAL6
       23 Facility/LOCAL7))
-  (testing "from strings"
+  (testing "from facility labels"
     (are [s facility] (= (@#'unclogged.core/facility s) facility)
       "KERN" Facility/KERN
       "USER" Facility/USER
