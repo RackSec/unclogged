@@ -119,12 +119,23 @@
       :locaL7 Facility/LOCAL7)))
 
 (deftest severity-tests
-  (are [code severity] (= severity
-                          (@#'unclogged.core/severity code))
-    1 Severity/ALERT
-    2 Severity/CRITICAL
-    3 Severity/ERROR
-    4 Severity/WARNING
-    5 Severity/NOTICE
-    6 Severity/INFORMATIONAL
-    7 Severity/DEBUG))
+  (testing "from numerical codes"
+    (are [code severity] (= severity
+                            (@#'unclogged.core/severity code))
+      1 Severity/ALERT
+      2 Severity/CRITICAL
+      3 Severity/ERROR
+      4 Severity/WARNING
+      5 Severity/NOTICE
+      6 Severity/INFORMATIONAL
+      7 Severity/DEBUG))
+  (testing "from labels"
+    (are [code severity] (= severity
+                            (@#'unclogged.core/severity code))
+      "ALERT" Severity/ALERT
+      "CRITICAL" Severity/CRITICAL
+      "ERROR" Severity/ERROR
+      "WARNING" Severity/WARNING
+      "NOTICE" Severity/NOTICE
+      "INFORMATIONAL" Severity/INFORMATIONAL
+      "DEBUG" Severity/DEBUG)))
