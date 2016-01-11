@@ -15,7 +15,7 @@
 (deftest facility-tests
   (testing "from numerical codes"
     (are [code facility] (let [flag (facility-bit-flag code)]
-                           (= facility (@#'unclogged.core/facility flag)))
+                           (= facility (#'unclogged.core/facility flag)))
       0 Facility/KERN
       1 Facility/USER
       2 Facility/MAIL
@@ -41,7 +41,7 @@
       22 Facility/LOCAL6
       23 Facility/LOCAL7))
   (testing "from facility labels"
-    (are [s facility] (= (@#'unclogged.core/facility s) facility)
+    (are [s facility] (= (#'unclogged.core/facility s) facility)
       "KERN" Facility/KERN
       "USER" Facility/USER
       "MAIL" Facility/MAIL
@@ -67,7 +67,7 @@
       "LOCAL6" Facility/LOCAL6
       "LOCAL7" Facility/LOCAL7))
   (testing "from lower case"
-    (are [s facility] (= facility (@#'unclogged.core/facility s))
+    (are [s facility] (= facility (#'unclogged.core/facility s))
       "kern" Facility/KERN
       "user" Facility/USER
       "mail" Facility/MAIL
@@ -93,7 +93,7 @@
       "locaL6" Facility/LOCAL6
       "locaL7" Facility/LOCAL7))
   (testing "from keyword"
-    (are [s facility] (= facility (@#'unclogged.core/facility s))
+    (are [s facility] (= facility (#'unclogged.core/facility s))
       :kern Facility/KERN
       :user Facility/USER
       :mail Facility/MAIL
@@ -122,7 +122,7 @@
 (deftest severity-tests
   (testing "from numerical codes"
     (are [code severity] (= severity
-                            (@#'unclogged.core/severity code))
+                            (#'unclogged.core/severity code))
       1 Severity/ALERT
       2 Severity/CRITICAL
       3 Severity/ERROR
@@ -132,7 +132,7 @@
       7 Severity/DEBUG))
   (testing "from labels"
     (are [label severity] (= severity
-                             (@#'unclogged.core/severity label))
+                             (#'unclogged.core/severity label))
       "ALERT" Severity/ALERT
       "CRITICAL" Severity/CRITICAL
       "ERROR" Severity/ERROR
@@ -142,7 +142,7 @@
       "DEBUG" Severity/DEBUG))
   (testing "from lower case labels"
     (are [label severity] (= severity
-                             (@#'unclogged.core/severity label))
+                             (#'unclogged.core/severity label))
       "alert" Severity/ALERT
       "critical" Severity/CRITICAL
       "error" Severity/ERROR
@@ -152,7 +152,7 @@
       "debug" Severity/DEBUG))
   (testing "from keywords"
     (are [kw severity] (= severity
-                          (@#'unclogged.core/severity kw))
+                          (#'unclogged.core/severity kw))
       :alert Severity/ALERT
       :critical Severity/CRITICAL
       :error Severity/ERROR
@@ -164,16 +164,16 @@
     (are [sev-alias severity] (let [as-str (name sev-alias)
                                     upper-case (.toUpperCase ^String as-str)]
                                 (= severity
-                                   (@#'unclogged.core/severity sev-alias)
-                                   (@#'unclogged.core/severity as-str)
-                                   (@#'unclogged.core/severity upper-case)))
+                                   (#'unclogged.core/severity sev-alias)
+                                   (#'unclogged.core/severity as-str)
+                                   (#'unclogged.core/severity upper-case)))
       :info Severity/INFORMATIONAL
       :err Severity/ERROR
       :warn Severity/WARNING)))
 
 (deftest message-format-tests
   (testing "from strings"
-    (are [s fmt] (= fmt (@#'unclogged.core/message-format s))
+    (are [s fmt] (= fmt (#'unclogged.core/message-format s))
       "RFC 3164" MessageFormat/RFC_3164
       "RFC-3164" MessageFormat/RFC_3164
       "RFC_3164" MessageFormat/RFC_3164
@@ -192,7 +192,7 @@
       "rfc_5424" MessageFormat/RFC_5424
       "rfc5424" MessageFormat/RFC_5424))
   (testing "from keywords"
-    (are [kw fmt] (= fmt (@#'unclogged.core/message-format kw))
+    (are [kw fmt] (= fmt (#'unclogged.core/message-format kw))
       :RFC-3164 MessageFormat/RFC_3164
       :RFC_3164 MessageFormat/RFC_3164
       :RFC-3164 MessageFormat/RFC_3164
@@ -218,7 +218,7 @@
                     :app-name "unclogged"
                     :hostname "ditka"
                     :process-id "1234"}
-          syslog-msg (@#'unclogged.core/->syslog-msg {} contents)]
+          syslog-msg (#'unclogged.core/->syslog-msg {} contents)]
       (is (= "hello" (.toString (.getMsg ^SyslogMessage syslog-msg))))
       (is (= "xyzzy" (.getMsgId ^SyslogMessage syslog-msg)))
       (is (= "unclogged" (.getAppName ^SyslogMessage syslog-msg)))
@@ -230,7 +230,7 @@
                     :process-id "1234"}
           contents {:message "hello"
                     :message-id "xyzzy"}
-          syslog-msg (@#'unclogged.core/->syslog-msg defaults contents)]
+          syslog-msg (#'unclogged.core/->syslog-msg defaults contents)]
       (is (= "hello" (.toString (.getMsg ^SyslogMessage syslog-msg))))
       (is (= "xyzzy" (.getMsgId ^SyslogMessage syslog-msg)))
       (is (= "unclogged" (.getAppName ^SyslogMessage syslog-msg)))
@@ -242,7 +242,7 @@
                     :process-id 1234}
           contents {:message [[:a] [[[{:b :c}]]]]
                     :message-id "xyzzy"}
-          syslog-msg (@#'unclogged.core/->syslog-msg defaults contents)]
+          syslog-msg (#'unclogged.core/->syslog-msg defaults contents)]
       (is (= "[[:a] [[[{:b :c}]]]]"
              (.toString ^CharArrayWriter (.getMsg ^SyslogMessage syslog-msg))))
       (is (= "xyzzy" (.getMsgId ^SyslogMessage syslog-msg)))
