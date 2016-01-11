@@ -1,6 +1,6 @@
 (ns unclogged.core
   (:import
-   [com.cloudbees.syslog Facility Severity])
+   [com.cloudbees.syslog Facility Severity MessageFormat])
   (:gen-class))
 
 (defn ^:private facility
@@ -22,6 +22,12 @@
     (let [x (.toUpperCase ^String (name x))]
       (or (get severity-aliases x)
           (Severity/fromLabel x)))))
+
+(defn ^:private message-format
+  [s]
+  (case (re-find #"\d+" s)
+    "3164" MessageFormat/RFC_3164
+    "5424" MessageFormat/RFC_5424))
 
 (defn -main
   "I don't do a whole lot ... yet."
