@@ -1,6 +1,6 @@
 (ns unclogged.core
   (:import
-   [com.cloudbees.syslog Facility Severity MessageFormat])
+   [com.cloudbees.syslog Facility Severity MessageFormat SyslogMessage])
   (:gen-class))
 
 (defn ^:private facility
@@ -28,6 +28,26 @@
   (case (re-find #"\d+" (name s))
     "3164" MessageFormat/RFC_3164
     "5424" MessageFormat/RFC_5424))
+
+(defn ^:private ->syslog-msg
+  "Turns defaults + message map into a SyslogMessage."
+  [defaults message]
+  (let [{:keys [message
+                message-id
+                app-name
+                hostname
+                process-id
+                facility
+                severity]}
+        (merge defaults message)]
+    (doto (SyslogMessage.)
+      (.withMsg (str message))
+      (.withMsgId message-id)
+      (.withAppName app-name)
+      (.withHostname hostname)
+      (.withProcId (str process-id))
+      (.withFacility facility)
+      (.withSeverity severity))))
 
 (defn -main
   "I don't do a whole lot ... yet."
