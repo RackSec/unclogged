@@ -237,4 +237,17 @@
       (is (= "xyzzy" (.getMsgId ^SyslogMessage syslog-msg)))
       (is (= "unclogged" (.getAppName ^SyslogMessage syslog-msg)))
       (is (= "ditka" (.getHostname ^SyslogMessage syslog-msg)))
+      (is (= "1234" (.getProcId ^SyslogMessage syslog-msg)))))
+  (testing "type coercions"
+    (let [defaults {:app-name "unclogged"
+                    :hostname "ditka"
+                    :process-id 1234}
+          contents {:message [[:a] [[[{:b :c}]]]]
+                    :message-id "xyzzy"}
+          syslog-msg (@#'unclogged.core/->syslog-msg defaults contents)]
+      (is (= "[[:a] [[[{:b :c}]]]]"
+             (.toString ^CharArrayWriter (.getMsg ^SyslogMessage syslog-msg))))
+      (is (= "xyzzy" (.getMsgId ^SyslogMessage syslog-msg)))
+      (is (= "unclogged" (.getAppName ^SyslogMessage syslog-msg)))
+      (is (= "ditka" (.getHostname ^SyslogMessage syslog-msg)))
       (is (= "1234" (.getProcId ^SyslogMessage syslog-msg))))))
