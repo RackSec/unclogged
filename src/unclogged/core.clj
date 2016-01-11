@@ -3,7 +3,7 @@
    [com.cloudbees.syslog Facility Severity MessageFormat SyslogMessage])
   (:gen-class))
 
-(defn ^:private facility
+(defn ^:private parse-facility
   [x]
   (cond
     (keyword? x) (facility (name x))
