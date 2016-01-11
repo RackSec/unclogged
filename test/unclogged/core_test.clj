@@ -199,4 +199,13 @@
       :RFC3164 MessageFormat/RFC_3164
       :rfc-3164 MessageFormat/RFC_3164
       :rfc_3164 MessageFormat/RFC_3164
-      :rfc3164 MessageFormat/RFC_3164)))
+      :rfc3164 MessageFormat/RFC_3164
+
+      :RFC-5424 MessageFormat/RFC_5424
+      :RFC_5424 MessageFormat/RFC_5424
+      :RFC-5424 MessageFormat/RFC_5424
+      :RFC_5424 MessageFormat/RFC_5424
+      :RFC5424 MessageFormat/RFC_5424
+      :rfc-5424 MessageFormat/RFC_5424
+      :rfc_5424 MessageFormat/RFC_5424
+      :rfc5424 MessageFormat/RFC_5424)))
