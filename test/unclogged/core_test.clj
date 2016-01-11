@@ -3,7 +3,8 @@
    [clojure.test :as t :refer [deftest testing is are]]
    [unclogged.core :as c])
   (:import
-   [com.cloudbees.syslog Facility Severity MessageFormat SyslogMessage]))
+   [com.cloudbees.syslog Facility Severity MessageFormat SyslogMessage]
+   [java.io CharArrayWriter]))
 
 (defn facility-bit-flag
   "In syslog, facilities don't use the lowest 2 bits; they're ints
@@ -219,7 +220,7 @@
                     :process-id "1234"}
           syslog-msg (@#'unclogged.core/->syslog-msg {} contents)]
       (is (= "hello" (.getMsg syslog-msg)))
-      (is (= "xyzzy" (.getMsgId syslog-msg)))
-      (is (= "unclogged" (.getAppName syslog-msg)))
-      (is (= "ditka" (.getHostname syslog-msg)))
-      (is (= "1234" (.getProcId syslog-msg))))))
+      (is (= "xyzzy" (.getMsgId ^SyslogMessage syslog-msg)))
+      (is (= "unclogged" (.getAppName ^SyslogMessage syslog-msg)))
+      (is (= "ditka" (.getHostname ^SyslogMessage syslog-msg)))
+      (is (= "1234" (.getProcId ^SyslogMessage syslog-msg))))))
