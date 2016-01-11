@@ -192,11 +192,11 @@
       "rfc5424" MessageFormat/RFC_5424))
   (testing "from keywords"
     (are [kw fmt] (= fmt (@#'unclogged.core/message-format kw))
-      :RFC-3164
-      :RFC_3164
-      :RFC-3164
-      :RFC_3164
-      :RFC3164
-      :rfc-3164
-      :rfc_3164
-      :rfc3164)))
+      :RFC-3164 MessageFormat/RFC_3164
+      :RFC_3164 MessageFormat/RFC_3164
+      :RFC-3164 MessageFormat/RFC_3164
+      :RFC_3164 MessageFormat/RFC_3164
+      :RFC3164 MessageFormat/RFC_3164
+      :rfc-3164 MessageFormat/RFC_3164
+      :rfc_3164 MessageFormat/RFC_3164
+      :rfc3164 MessageFormat/RFC_3164)))
