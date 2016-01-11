@@ -25,7 +25,7 @@
 
 (defn ^:private message-format
   [s]
-  (case (re-find #"\d+" s)
+  (case (re-find #"\d+" (name s))
     "3164" MessageFormat/RFC_3164
     "5424" MessageFormat/RFC_5424))
 
