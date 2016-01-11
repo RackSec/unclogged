@@ -15,7 +15,7 @@
 (deftest facility-tests
   (testing "from numerical codes"
     (are [code facility] (let [flag (facility-bit-flag code)]
-                           (= facility (#'unclogged.core/facility flag)))
+                           (= facility (#'unclogged.core/parse-facility flag)))
       0 Facility/KERN
       1 Facility/USER
       2 Facility/MAIL
@@ -41,7 +41,7 @@
       22 Facility/LOCAL6
       23 Facility/LOCAL7))
   (testing "from facility labels"
-    (are [s facility] (= (#'unclogged.core/facility s) facility)
+    (are [s facility] (= (#'unclogged.core/parse-facility s) facility)
       "KERN" Facility/KERN
       "USER" Facility/USER
       "MAIL" Facility/MAIL
@@ -67,7 +67,7 @@
       "LOCAL6" Facility/LOCAL6
       "LOCAL7" Facility/LOCAL7))
   (testing "from lower case"
-    (are [s facility] (= facility (#'unclogged.core/facility s))
+    (are [s facility] (= facility (#'unclogged.core/parse-facility s))
       "kern" Facility/KERN
       "user" Facility/USER
       "mail" Facility/MAIL
@@ -93,7 +93,7 @@
       "locaL6" Facility/LOCAL6
       "locaL7" Facility/LOCAL7))
   (testing "from keyword"
-    (are [s facility] (= facility (#'unclogged.core/facility s))
+    (are [s facility] (= facility (#'unclogged.core/parse-facility s))
       :kern Facility/KERN
       :user Facility/USER
       :mail Facility/MAIL
