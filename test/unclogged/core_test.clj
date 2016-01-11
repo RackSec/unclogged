@@ -3,7 +3,7 @@
    [clojure.test :as t :refer [deftest testing is are]]
    [unclogged.core :as c])
   (:import
-   [com.cloudbees.syslog Facility Severity]))
+   [com.cloudbees.syslog Facility Severity MessageFormat]))
 
 (defn facility-bit-flag
   "In syslog, facilities don't use the lowest 2 bits; they're ints
@@ -169,3 +169,24 @@
       :info Severity/INFORMATIONAL
       :err Severity/ERROR
       :warn Severity/WARNING)))
+
+(deftest message-format-tests
+  (testing "from strings"
+    (are [s fmt] (= fmt (@#'unclogged.core/message-format s))
+      "RFC 3164" MessageFormat/RFC_3164
+      "RFC-3164" MessageFormat/RFC_3164
+      "RFC_3164" MessageFormat/RFC_3164
+      "RFC3164" MessageFormat/RFC_3164
+      "rfc 3164" MessageFormat/RFC_3164
+      "rfc-3164" MessageFormat/RFC_3164
+      "rfc_3164" MessageFormat/RFC_3164
+      "rfc3164" MessageFormat/RFC_3164
+
+      "RFC 5424" MessageFormat/RFC_5424
+      "RFC-5424" MessageFormat/RFC_5424
+      "RFC_5424" MessageFormat/RFC_5424
+      "RFC5424" MessageFormat/RFC_5424
+      "rfc 5424" MessageFormat/RFC_5424
+      "rfc-5424" MessageFormat/RFC_5424
+      "rfc_5424" MessageFormat/RFC_5424
+      "rfc5424" MessageFormat/RFC_5424)))
