@@ -15,7 +15,7 @@
    "WARN" Severity/WARNING
    "ERR" Severity/ERROR})
 
-(defn ^:private severity
+(defn ^:private parse-severity
   [x]
   (if (number? x)
     (Severity/fromNumericalCode x)
