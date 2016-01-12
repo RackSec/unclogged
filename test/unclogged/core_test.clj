@@ -264,7 +264,7 @@
       (is (= "unclogged" (.getAppName ^SyslogMessage syslog-msg)))
       (is (= "ditka" (.getHostname ^SyslogMessage syslog-msg)))
       (is (= "1234" (.getProcId ^SyslogMessage syslog-msg)))
-      (is (= Severity/INFORMATIONAL
+      (is (= (#'unclogged.core/parse-severity :info)
              (.getSeverity ^SyslogMessage syslog-msg)))
-      (is (= Facility/KERN
+      (is (= (#'unclogged.core/parse-facility :kern)
              (.getFacility ^SyslogMessage syslog-msg))))))
