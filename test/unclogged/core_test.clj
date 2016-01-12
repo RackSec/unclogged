@@ -254,11 +254,17 @@
                     :hostname "ditka"
                     :process-id 1234}
           contents {:message [[:a] [[[{:b :c}]]]]
-                    :message-id "xyzzy"}
+                    :message-id "xyzzy"
+                    :severity :info
+                    :facility :kern}
           syslog-msg (#'unclogged.core/->syslog-msg defaults contents)]
       (is (= "[[:a] [[[{:b :c}]]]]"
              (.toString ^CharArrayWriter (.getMsg ^SyslogMessage syslog-msg))))
       (is (= "xyzzy" (.getMsgId ^SyslogMessage syslog-msg)))
       (is (= "unclogged" (.getAppName ^SyslogMessage syslog-msg)))
       (is (= "ditka" (.getHostname ^SyslogMessage syslog-msg)))
-      (is (= "1234" (.getProcId ^SyslogMessage syslog-msg))))))
+      (is (= "1234" (.getProcId ^SyslogMessage syslog-msg)))
+      (is (= Severity/INFORMATIONAL
+             (.getSeverity ^SyslogMessage syslog-msg)))
+      (is (= Facility/KERN
+             (.getFacility ^SyslogMessage syslog-msg))))))
