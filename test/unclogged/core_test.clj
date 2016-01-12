@@ -122,7 +122,7 @@
 (deftest severity-tests
   (testing "from numerical codes"
     (are [code severity] (= severity
-                            (#'unclogged.core/severity code))
+                            (#'unclogged.core/parse-severity code))
       1 Severity/ALERT
       2 Severity/CRITICAL
       3 Severity/ERROR
@@ -132,7 +132,7 @@
       7 Severity/DEBUG))
   (testing "from labels"
     (are [label severity] (= severity
-                             (#'unclogged.core/severity label))
+                             (#'unclogged.core/parse-severity label))
       "ALERT" Severity/ALERT
       "CRITICAL" Severity/CRITICAL
       "ERROR" Severity/ERROR
@@ -142,7 +142,7 @@
       "DEBUG" Severity/DEBUG))
   (testing "from lower case labels"
     (are [label severity] (= severity
-                             (#'unclogged.core/severity label))
+                             (#'unclogged.core/parse-severity label))
       "alert" Severity/ALERT
       "critical" Severity/CRITICAL
       "error" Severity/ERROR
@@ -152,7 +152,7 @@
       "debug" Severity/DEBUG))
   (testing "from keywords"
     (are [kw severity] (= severity
-                          (#'unclogged.core/severity kw))
+                          (#'unclogged.core/parse-severity kw))
       :alert Severity/ALERT
       :critical Severity/CRITICAL
       :error Severity/ERROR
@@ -161,12 +161,13 @@
       :informational Severity/INFORMATIONAL
       :debug Severity/DEBUG))
   (testing "from aliases"
-    (are [sev-alias severity] (let [as-str (name sev-alias)
+    (are [sev-alias severity] (let [parse #'unclogged.core/parse-severity
+                                    as-str (name sev-alias)
                                     upper-case (.toUpperCase ^String as-str)]
                                 (= severity
-                                   (#'unclogged.core/severity sev-alias)
-                                   (#'unclogged.core/severity as-str)
-                                   (#'unclogged.core/severity upper-case)))
+                                   (parse sev-alias)
+                                   (parse as-str)
+                                   (parse upper-case)))
       :info Severity/INFORMATIONAL
       :err Severity/ERROR
       :warn Severity/WARNING)))
