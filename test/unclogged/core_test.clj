@@ -232,8 +232,8 @@
       (is (= severity (.getSeverity ^SyslogMessage syslog-msg)))
       (is (= facility (.getFacility ^SyslogMessage syslog-msg)))))
   (testing "some defaults, all keys"
-    (let [severity (@'unclogged.core/parse-severity :info)
-          facility (@'unclogged.core/parse-facility :kern)
+    (let [severity (#'unclogged.core/parse-severity :info)
+          facility (#'unclogged.core/parse-facility :kern)
           defaults {:app-name "unclogged"
                     :hostname "ditka"
                     :process-id "1234"}
