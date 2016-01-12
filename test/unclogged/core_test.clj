@@ -146,6 +146,15 @@
       :locaL7 Facility/LOCAL7)))
 
 (deftest severity-tests
+  (testing "original enum is a fixed point"
+    (are [severity] (= severity (#'unclogged.core/parse-severity severity))
+      Severity/ALERT
+      Severity/CRITICAL
+      Severity/ERROR
+      Severity/WARNING
+      Severity/NOTICE
+      Severity/INFORMATIONAL
+      Severity/DEBUG))
   (testing "from numerical codes"
     (are [code severity] (= severity
                             (#'unclogged.core/parse-severity code))
