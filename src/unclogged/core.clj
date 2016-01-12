@@ -18,11 +18,12 @@
 
 (defn ^:private parse-severity
   [x]
-  (if (number? x)
-    (Severity/fromNumericalCode x)
-    (let [x (.toUpperCase ^String (name x))]
-      (or (get severity-aliases x)
-          (Severity/fromLabel x)))))
+  (cond
+    (instance? Severity x) x
+    (number? x) (Severity/fromNumericalCode x)
+    :else (let [x (.toUpperCase ^String (name x))]
+            (or (get severity-aliases x)
+                (Severity/fromLabel x)))))
 
 (defn ^:private parse-message-format
   [s]
