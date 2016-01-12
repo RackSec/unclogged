@@ -214,8 +214,8 @@
 
 (deftest ->syslog-msg-tests
   (testing "no defaults, all keys"
-    (let [severity (@'unclogged.core/parse-severity :info)
-          facility (@'unclogged.core/parse-facility :kern)
+    (let [severity (#'unclogged.core/parse-severity :info)
+          facility (#'unclogged.core/parse-facility :kern)
           contents {:message "hello"
                     :message-id "xyzzy"
                     :app-name "unclogged"
