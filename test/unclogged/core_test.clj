@@ -3,7 +3,8 @@
    [clojure.test :as t :refer [deftest testing is are]]
    [unclogged.core :as c])
   (:import
-   [com.cloudbees.syslog Facility Severity MessageFormat]))
+   [com.cloudbees.syslog Facility Severity MessageFormat SyslogMessage]
+   [java.io CharArrayWriter]))
 
 (defn facility-bit-flag
   "In syslog, facilities don't use the lowest 2 bits; they're ints
@@ -12,9 +13,35 @@
   (bit-shift-left n 3))
 
 (deftest facility-tests
+  (testing "original enum is a fixed point"
+    (are [facility]  (= facility (#'unclogged.core/parse-facility facility))
+      Facility/KERN
+      Facility/USER
+      Facility/MAIL
+      Facility/DAEMON
+      Facility/AUTH
+      Facility/SYSLOG
+      Facility/LPR
+      Facility/NEWS
+      Facility/UUCP
+      Facility/CRON
+      Facility/AUTHPRIV
+      Facility/FTP
+      Facility/NTP
+      Facility/AUDIT
+      Facility/ALERT
+      Facility/CLOCK
+      Facility/LOCAL0
+      Facility/LOCAL1
+      Facility/LOCAL2
+      Facility/LOCAL3
+      Facility/LOCAL4
+      Facility/LOCAL5
+      Facility/LOCAL6
+      Facility/LOCAL7))
   (testing "from numerical codes"
     (are [code facility] (let [flag (facility-bit-flag code)]
-                           (= facility (@#'unclogged.core/facility flag)))
+                           (= facility (#'unclogged.core/parse-facility flag)))
       0 Facility/KERN
       1 Facility/USER
       2 Facility/MAIL
@@ -40,7 +67,7 @@
       22 Facility/LOCAL6
       23 Facility/LOCAL7))
   (testing "from facility labels"
-    (are [s facility] (= (@#'unclogged.core/facility s) facility)
+    (are [s facility] (= (#'unclogged.core/parse-facility s) facility)
       "KERN" Facility/KERN
       "USER" Facility/USER
       "MAIL" Facility/MAIL
@@ -66,7 +93,7 @@
       "LOCAL6" Facility/LOCAL6
       "LOCAL7" Facility/LOCAL7))
   (testing "from lower case"
-    (are [s facility] (= facility (@#'unclogged.core/facility s))
+    (are [s facility] (= facility (#'unclogged.core/parse-facility s))
       "kern" Facility/KERN
       "user" Facility/USER
       "mail" Facility/MAIL
@@ -92,7 +119,7 @@
       "locaL6" Facility/LOCAL6
       "locaL7" Facility/LOCAL7))
   (testing "from keyword"
-    (are [s facility] (= facility (@#'unclogged.core/facility s))
+    (are [s facility] (= facility (#'unclogged.core/parse-facility s))
       :kern Facility/KERN
       :user Facility/USER
       :mail Facility/MAIL
@@ -119,9 +146,18 @@
       :locaL7 Facility/LOCAL7)))
 
 (deftest severity-tests
+  (testing "original enum is a fixed point"
+    (are [severity] (= severity (#'unclogged.core/parse-severity severity))
+      Severity/ALERT
+      Severity/CRITICAL
+      Severity/ERROR
+      Severity/WARNING
+      Severity/NOTICE
+      Severity/INFORMATIONAL
+      Severity/DEBUG))
   (testing "from numerical codes"
     (are [code severity] (= severity
-                            (@#'unclogged.core/severity code))
+                            (#'unclogged.core/parse-severity code))
       1 Severity/ALERT
       2 Severity/CRITICAL
       3 Severity/ERROR
@@ -131,7 +167,7 @@
       7 Severity/DEBUG))
   (testing "from labels"
     (are [label severity] (= severity
-                             (@#'unclogged.core/severity label))
+                             (#'unclogged.core/parse-severity label))
       "ALERT" Severity/ALERT
       "CRITICAL" Severity/CRITICAL
       "ERROR" Severity/ERROR
@@ -141,7 +177,7 @@
       "DEBUG" Severity/DEBUG))
   (testing "from lower case labels"
     (are [label severity] (= severity
-                             (@#'unclogged.core/severity label))
+                             (#'unclogged.core/parse-severity label))
       "alert" Severity/ALERT
       "critical" Severity/CRITICAL
       "error" Severity/ERROR
@@ -151,7 +187,7 @@
       "debug" Severity/DEBUG))
   (testing "from keywords"
     (are [kw severity] (= severity
-                          (@#'unclogged.core/severity kw))
+                          (#'unclogged.core/parse-severity kw))
       :alert Severity/ALERT
       :critical Severity/CRITICAL
       :error Severity/ERROR
@@ -160,19 +196,20 @@
       :informational Severity/INFORMATIONAL
       :debug Severity/DEBUG))
   (testing "from aliases"
-    (are [sev-alias severity] (let [as-str (name sev-alias)
+    (are [sev-alias severity] (let [parse #'unclogged.core/parse-severity
+                                    as-str (name sev-alias)
                                     upper-case (.toUpperCase ^String as-str)]
                                 (= severity
-                                   (@#'unclogged.core/severity sev-alias)
-                                   (@#'unclogged.core/severity as-str)
-                                   (@#'unclogged.core/severity upper-case)))
+                                   (parse sev-alias)
+                                   (parse as-str)
+                                   (parse upper-case)))
       :info Severity/INFORMATIONAL
       :err Severity/ERROR
       :warn Severity/WARNING)))
 
 (deftest message-format-tests
   (testing "from strings"
-    (are [s fmt] (= fmt (@#'unclogged.core/message-format s))
+    (are [s fmt] (= fmt (#'unclogged.core/parse-message-format s))
       "RFC 3164" MessageFormat/RFC_3164
       "RFC-3164" MessageFormat/RFC_3164
       "RFC_3164" MessageFormat/RFC_3164
@@ -191,7 +228,7 @@
       "rfc_5424" MessageFormat/RFC_5424
       "rfc5424" MessageFormat/RFC_5424))
   (testing "from keywords"
-    (are [kw fmt] (= fmt (@#'unclogged.core/message-format kw))
+    (are [kw fmt] (= fmt (#'unclogged.core/parse-message-format kw))
       :RFC-3164 MessageFormat/RFC_3164
       :RFC_3164 MessageFormat/RFC_3164
       :RFC-3164 MessageFormat/RFC_3164
@@ -209,3 +246,60 @@
       :rfc-5424 MessageFormat/RFC_5424
       :rfc_5424 MessageFormat/RFC_5424
       :rfc5424 MessageFormat/RFC_5424)))
+
+(deftest ->syslog-msg-tests
+  (testing "no defaults, all keys"
+    (let [severity (#'unclogged.core/parse-severity :info)
+          facility (#'unclogged.core/parse-facility :kern)
+          contents {:message "hello"
+                    :message-id "xyzzy"
+                    :app-name "unclogged"
+                    :hostname "ditka"
+                    :process-id "1234"
+                    :severity severity
+                    :facility facility}
+          syslog-msg (#'unclogged.core/->syslog-msg {} contents)]
+      (is (= "hello" (.toString (.getMsg ^SyslogMessage syslog-msg))))
+      (is (= "xyzzy" (.getMsgId ^SyslogMessage syslog-msg)))
+      (is (= "unclogged" (.getAppName ^SyslogMessage syslog-msg)))
+      (is (= "ditka" (.getHostname ^SyslogMessage syslog-msg)))
+      (is (= "1234" (.getProcId ^SyslogMessage syslog-msg)))
+      (is (= severity (.getSeverity ^SyslogMessage syslog-msg)))
+      (is (= facility (.getFacility ^SyslogMessage syslog-msg)))))
+  (testing "some defaults, all keys"
+    (let [severity (#'unclogged.core/parse-severity :info)
+          facility (#'unclogged.core/parse-facility :kern)
+          defaults {:app-name "unclogged"
+                    :hostname "ditka"
+                    :process-id "1234"}
+          contents {:message "hello"
+                    :message-id "xyzzy"
+                    :severity severity
+                    :facility facility}
+          syslog-msg (#'unclogged.core/->syslog-msg defaults contents)]
+      (is (= "hello" (.toString (.getMsg ^SyslogMessage syslog-msg))))
+      (is (= "xyzzy" (.getMsgId ^SyslogMessage syslog-msg)))
+      (is (= "unclogged" (.getAppName ^SyslogMessage syslog-msg)))
+      (is (= "ditka" (.getHostname ^SyslogMessage syslog-msg)))
+      (is (= "1234" (.getProcId ^SyslogMessage syslog-msg)))
+      (is (= severity (.getSeverity ^SyslogMessage syslog-msg)))
+      (is (= facility (.getFacility ^SyslogMessage syslog-msg)))))
+  (testing "type coercions"
+    (let [defaults {:app-name "unclogged"
+                    :hostname "ditka"
+                    :process-id 1234}
+          contents {:message [[:a] [[[{:b :c}]]]]
+                    :message-id "xyzzy"
+                    :severity :info
+                    :facility :kern}
+          syslog-msg (#'unclogged.core/->syslog-msg defaults contents)]
+      (is (= "[[:a] [[[{:b :c}]]]]"
+             (.toString ^CharArrayWriter (.getMsg ^SyslogMessage syslog-msg))))
+      (is (= "xyzzy" (.getMsgId ^SyslogMessage syslog-msg)))
+      (is (= "unclogged" (.getAppName ^SyslogMessage syslog-msg)))
+      (is (= "ditka" (.getHostname ^SyslogMessage syslog-msg)))
+      (is (= "1234" (.getProcId ^SyslogMessage syslog-msg)))
+      (is (= Severity/INFORMATIONAL
+             (.getSeverity ^SyslogMessage syslog-msg)))
+      (is (= Facility/KERN
+             (.getFacility ^SyslogMessage syslog-msg))))))
