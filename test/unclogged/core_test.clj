@@ -13,6 +13,32 @@
   (bit-shift-left n 3))
 
 (deftest facility-tests
+  (testing "original enum is a fixed point"
+    (are [facility]  (= facility (#'unclogged.core/parse-facility facility))
+      Facility/KERN
+      Facility/USER
+      Facility/MAIL
+      Facility/DAEMON
+      Facility/AUTH
+      Facility/SYSLOG
+      Facility/LPR
+      Facility/NEWS
+      Facility/UUCP
+      Facility/CRON
+      Facility/AUTHPRIV
+      Facility/FTP
+      Facility/NTP
+      Facility/AUDIT
+      Facility/ALERT
+      Facility/CLOCK
+      Facility/LOCAL0
+      Facility/LOCAL1
+      Facility/LOCAL2
+      Facility/LOCAL3
+      Facility/LOCAL4
+      Facility/LOCAL5
+      Facility/LOCAL6
+      Facility/LOCAL7))
   (testing "from numerical codes"
     (are [code facility] (let [flag (facility-bit-flag code)]
                            (= facility (#'unclogged.core/parse-facility flag)))
