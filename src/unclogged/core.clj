@@ -46,8 +46,8 @@
       (.withAppName app-name)
       (.withHostname hostname)
       (.withProcId (str process-id))
-      (.withFacility facility)
-      (.withSeverity severity))))
+      (.withFacility (parse-facility facility))
+      (.withSeverity (parse-severity severity)))))
 
 (defn -main
   "I don't do a whole lot ... yet."
