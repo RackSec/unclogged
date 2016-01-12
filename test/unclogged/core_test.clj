@@ -214,17 +214,23 @@
 
 (deftest ->syslog-msg-tests
   (testing "no defaults, all keys"
-    (let [contents {:message "hello"
+    (let [severity (@'unclogged.core/parse-severity :info)
+          facility (@'unclogged.core/parse-facility :kern)
+          contents {:message "hello"
                     :message-id "xyzzy"
                     :app-name "unclogged"
                     :hostname "ditka"
-                    :process-id "1234"}
+                    :process-id "1234"
+                    :severity severity
+                    :facility facility}
           syslog-msg (#'unclogged.core/->syslog-msg {} contents)]
       (is (= "hello" (.toString (.getMsg ^SyslogMessage syslog-msg))))
       (is (= "xyzzy" (.getMsgId ^SyslogMessage syslog-msg)))
       (is (= "unclogged" (.getAppName ^SyslogMessage syslog-msg)))
       (is (= "ditka" (.getHostname ^SyslogMessage syslog-msg)))
-      (is (= "1234" (.getProcId ^SyslogMessage syslog-msg)))))
+      (is (= "1234" (.getProcId ^SyslogMessage syslog-msg)))
+      (is (= severity (.getSeverity ^SyslogMessage syslog-msg)))
+      (is (= facility (.getFacility ^SyslogMessage syslog-msg)))))
   (testing "some defaults, all keys"
     (let [defaults {:app-name "unclogged"
                     :hostname "ditka"
