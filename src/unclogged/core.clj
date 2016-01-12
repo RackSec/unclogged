@@ -6,6 +6,7 @@
 (defn ^:private parse-facility
   [x]
   (cond
+    (instance? Facility x) x
     (keyword? x) (parse-facility (name x))
     (string? x) (Facility/fromLabel (.toUpperCase ^String x))
     (number? x) (Facility/fromNumericalCode x)))
