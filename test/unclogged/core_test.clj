@@ -232,17 +232,23 @@
       (is (= severity (.getSeverity ^SyslogMessage syslog-msg)))
       (is (= facility (.getFacility ^SyslogMessage syslog-msg)))))
   (testing "some defaults, all keys"
-    (let [defaults {:app-name "unclogged"
+    (let [severity (@'unclogged.core/parse-severity :info)
+          facility (@'unclogged.core/parse-facility :kern)
+          defaults {:app-name "unclogged"
                     :hostname "ditka"
                     :process-id "1234"}
           contents {:message "hello"
-                    :message-id "xyzzy"}
+                    :message-id "xyzzy"
+                    :severity severity
+                    :facility facility}
           syslog-msg (#'unclogged.core/->syslog-msg defaults contents)]
       (is (= "hello" (.toString (.getMsg ^SyslogMessage syslog-msg))))
       (is (= "xyzzy" (.getMsgId ^SyslogMessage syslog-msg)))
       (is (= "unclogged" (.getAppName ^SyslogMessage syslog-msg)))
       (is (= "ditka" (.getHostname ^SyslogMessage syslog-msg)))
-      (is (= "1234" (.getProcId ^SyslogMessage syslog-msg)))))
+      (is (= "1234" (.getProcId ^SyslogMessage syslog-msg)))
+      (is (= severity (.getSeverity ^SyslogMessage syslog-msg)))
+      (is (= facility (.getFacility ^SyslogMessage syslog-msg)))))
   (testing "type coercions"
     (let [defaults {:app-name "unclogged"
                     :hostname "ditka"
