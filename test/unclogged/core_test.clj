@@ -174,7 +174,7 @@
 
 (deftest message-format-tests
   (testing "from strings"
-    (are [s fmt] (= fmt (#'unclogged.core/message-format s))
+    (are [s fmt] (= fmt (#'unclogged.core/parse-message-format s))
       "RFC 3164" MessageFormat/RFC_3164
       "RFC-3164" MessageFormat/RFC_3164
       "RFC_3164" MessageFormat/RFC_3164
@@ -193,7 +193,7 @@
       "rfc_5424" MessageFormat/RFC_5424
       "rfc5424" MessageFormat/RFC_5424))
   (testing "from keywords"
-    (are [kw fmt] (= fmt (#'unclogged.core/message-format kw))
+    (are [kw fmt] (= fmt (#'unclogged.core/parse-message-format kw))
       :RFC-3164 MessageFormat/RFC_3164
       :RFC_3164 MessageFormat/RFC_3164
       :RFC-3164 MessageFormat/RFC_3164
