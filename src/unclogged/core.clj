@@ -23,7 +23,7 @@
       (or (get severity-aliases x)
           (Severity/fromLabel x)))))
 
-(defn ^:private message-format
+(defn ^:private parse-message-format
   [s]
   (case (re-find #"\d+" (name s))
     "3164" MessageFormat/RFC_3164
