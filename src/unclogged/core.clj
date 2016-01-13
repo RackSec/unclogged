@@ -63,7 +63,7 @@
   (case transport
     :udp (UdpSyslogMessageSender.)
     :tcp (TcpSyslogMessageSender.)
-    ;; TLS is enabled below.
+    ;; TLS is enabled in configured-syslog.
     :tls (TcpSyslogMessageSender.)
     :ssl (TcpSyslogMessageSender.)))
 
