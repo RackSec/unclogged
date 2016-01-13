@@ -76,9 +76,9 @@
   implementation wouldn't check for that at all, and decomplect the
   concerns of providing defaults with the actual send-syslog-messages
   bits."
-  [conn-details]
+  [conn-opts]
   (let [{:keys [host port message-format transport]
-         :or {:transport :tls}} conn-details
+         :or {:transport :tls}} conn-opts
         syslog (make-syslog transport)]
     (.setSyslogServerHostname syslog host)
     (when port
@@ -106,9 +106,9 @@
   Returns the source, annotated with :unclogged/syslog in its
   metadata. This is only provided for inspection; mutating that object
   is not guaranteed to have desired effects."
-  [source conn-details defaults]
+  [source conn-opts defaults]
   (let [actual-defaults (merge system-defaults defaults)
-        syslog (configured-syslog conn-details)
+        syslog (configured-syslog conn-opts)
         send! (fn [message-details]
                 (->> message-details
                      (->syslog-msg actual-defaults)
