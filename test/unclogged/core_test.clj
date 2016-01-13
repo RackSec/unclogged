@@ -315,7 +315,11 @@
 (deftest ->syslog!-tests
   (let [results (s/stream)
         source (s/stream)
-        connection-map {:host "halas"
+        connection-map {;; getting hostname later will call InetAddress's
+                        ;; getByName, which tries to resolve. So, the host has to be
+                        ;; resolvable, or the tests fail. I wanted this to
+                        ;; be "halas".
+                        :host "localhost"
                         :port 1895
                         ;; we use the tls transport because that has
                         ;; the most interesting behavior
@@ -350,7 +354,7 @@
                (.getSeverity syslog-message)))) ;; unclogged default
       (let [syslog (:unclogged/syslog (meta source))]
         (is (some? syslog))
-        (is (= "halas" (.getSyslogServerHostname syslog)))
+        (is (= "localhost" (.getSyslogServerHostname syslog)))
         (is (= 1895 (.getSyslogServerPort syslog)))
         (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))
         (is (.isSsl syslog))))))
