@@ -315,16 +315,11 @@
 (deftest ->syslog!-tests
   (let [results (s/stream)
         inputs (s/stream)
-        connection-map {;; getting hostname later will call InetAddress's
-                        ;; getByName, which tries to resolve. So, the host has to be
-                        ;; resolvable, or the tests fail. I wanted this to
-                        ;; be "halas".
-                        :host "localhost"
-                        :port 1895
-                        ;; we use the tls transport because that has
-                        ;; the most interesting behavior
-                        :transport :tls
-                        :message-format :rfc-5424}
+        conn-opts {:host "localhost"
+                   :port 1895
+                   ;; tls transport has the most interesting behavior
+                   :transport :tls
+                   :message-format :rfc-5424}
         syslog-defaults {:hostname "dabears"
                          :app-name "ditka"
                          :process-id 89
@@ -335,7 +330,7 @@
         message-details {:message "only in message"
                          :message-id "only in message"}]
     (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
-      (c/->syslog! inputs connection-map syslog-defaults)
+      (c/->syslog! inputs conn-opts syslog-defaults)
       (s/put! inputs message-details)
       (let [syslog-message @(s/take! results)]
         (is (= "only in message"
@@ -361,16 +356,15 @@
 
 (deftest syslog-sink-tests
   (let [results (s/stream)
-        connection-map {;; getting hostname later will call InetAddress's
-                        ;; getByName, which tries to resolve. So, the host has to be
-                        ;; resolvable, or the tests fail. I wanted this to
-                        ;; be "halas".
-                        :host "localhost"
-                        :port 1895
-                        ;; we use the tls transport because that has
-                        ;; the most interesting behavior
-                        :transport :tls
-                        :message-format :rfc-5424}
+        conn-opts {;; getting hostname later will call InetAddress's
+                   ;; getByName, which tries to resolve. So, the host has to
+                   ;; be resolvable, or the tests fail. I wanted "halas".
+                   :host "localhost"
+                   :port 1895
+                   ;; we use the tls transport because that has
+                   ;; the most interesting behavior
+                   :transport :tls
+                   :message-format :rfc-5424}
         syslog-defaults {:hostname "dabears"
                          :app-name "ditka"
                          :process-id 89
@@ -381,7 +375,7 @@
         message-details {:message "only in message"
                          :message-id "only in message"}]
     (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
-      (let [inputs (c/syslog-sink connection-map syslog-defaults)]
+      (let [inputs (c/syslog-sink conn-opts syslog-defaults)]
         (s/put! inputs message-details)
         (let [syslog-message @(s/take! results)
               syslog (:unclogged/syslog (meta inputs))]
