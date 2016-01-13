@@ -349,4 +349,5 @@
         (is (= Severity/INFORMATIONAL
                (.getSeverity syslog-message)))) ;; unclogged default
       (let [syslog (:unclogged/syslog (meta source))]
-        (is (some? syslog))))))
+        (is (some? syslog))
+        (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))))))
