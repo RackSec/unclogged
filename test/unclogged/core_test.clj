@@ -348,4 +348,5 @@
                (.getFacility syslog-message))) ;; instance-default
         (is (= Severity/INFORMATIONAL
                (.getSeverity syslog-message)))) ;; unclogged default
-      )))
+      (let [syslog (:unclogged/syslog (meta source))]
+        (is (some? syslog))))))
