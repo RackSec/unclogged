@@ -84,7 +84,7 @@
     (when port
       (.setSyslogServerPort syslog port))
     (when message-format
-      (.setMessageFormat syslog (message-format message-format)))
+      (.setMessageFormat syslog (parse-message-format message-format)))
     (when (#{:tls :ssl} transport)
       (.setSsl syslog true))
     syslog))
