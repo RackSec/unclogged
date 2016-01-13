@@ -350,4 +350,7 @@
                (.getSeverity syslog-message)))) ;; unclogged default
       (let [syslog (:unclogged/syslog (meta source))]
         (is (some? syslog))
-        (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))))))
+        (is (= "halas" (.getSyslogServerHostname syslog)))
+        (is (= 1895 (.getSyslogServerPort syslog)))
+        (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))
+        (is (.isSsl syslog))))))
