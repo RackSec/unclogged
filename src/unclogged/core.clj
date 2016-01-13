@@ -113,6 +113,7 @@
                 (->> message-details
                      (->syslog-msg actual-defaults)
                      (.sendMessage syslog)))]
+    (alter-meta! source assoc :unclogged/syslog syslog)
     (s/consume send! source)))
 
 (defn syslog-sink
