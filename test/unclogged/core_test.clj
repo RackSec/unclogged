@@ -316,8 +316,7 @@
   (let [results (s/stream)
         source (s/stream)
         connection-map {:host "halas"
-                        ;; port is a string to check coercion to int:
-                        :port "1895"
+                        :port 1895
                         ;; we use the tls transport because that has
                         ;; the most interesting behavior
                         :transport :tls
