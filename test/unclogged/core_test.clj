@@ -314,7 +314,7 @@
 
 (deftest ->syslog!-tests
   (let [results (s/stream)
-        source (s/stream)
+        inputs (s/stream)
         connection-map {;; getting hostname later will call InetAddress's
                         ;; getByName, which tries to resolve. So, the host has to be
                         ;; resolvable, or the tests fail. I wanted this to
@@ -335,8 +335,8 @@
         message-details {:message "only in message"
                          :message-id "only in message"}]
     (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
-      (c/->syslog! source connection-map syslog-defaults)
-      (s/put! source message-details)
+      (c/->syslog! inputs connection-map syslog-defaults)
+      (s/put! inputs message-details)
       (let [syslog-message @(s/take! results)]
         (is (= "only in message"
                (.toString ^CharArrayWriter (.getMsg syslog-message))))
@@ -352,9 +352,56 @@
                (.getFacility syslog-message))) ;; instance-default
         (is (= Severity/INFORMATIONAL
                (.getSeverity syslog-message)))) ;; unclogged default
-      (let [syslog (:unclogged/syslog (meta source))]
+      (let [syslog (:unclogged/syslog (meta inputs))]
         (is (some? syslog))
         (is (= "localhost" (.getSyslogServerHostname syslog)))
         (is (= 1895 (.getSyslogServerPort syslog)))
         (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))
         (is (.isSsl syslog))))))
+
+(deftest syslog-sink-tests
+  (let [results (s/stream)
+        connection-map {;; getting hostname later will call InetAddress's
+                        ;; getByName, which tries to resolve. So, the host has to be
+                        ;; resolvable, or the tests fail. I wanted this to
+                        ;; be "halas".
+                        :host "localhost"
+                        :port 1895
+                        ;; we use the tls transport because that has
+                        ;; the most interesting behavior
+                        :transport :tls
+                        :message-format :rfc-5424}
+        syslog-defaults {:hostname "dabears"
+                         :app-name "ditka"
+                         :process-id 89
+                         :facility Facility/KERN}
+        ;; Above, KERN overrides unclogged default, which is USER.
+        ;; This is meant to test that message details override syslog
+        ;; client instance defaults override our package defaults.
+        message-details {:message "only in message"
+                         :message-id "only in message"}]
+    (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
+      (let [inputs (c/syslog-sink connection-map syslog-defaults)]
+        (s/put! inputs message-details)
+        (let [syslog-message @(s/take! results)
+              syslog (:unclogged/syslog (meta inputs))]
+          (is (= "only in message"
+                 (.toString ^CharArrayWriter (.getMsg syslog-message))))
+          (is (= "only in message"
+                 (.getMsgId syslog-message)))
+          (is (= "ditka"
+                 (.getAppName syslog-message)))
+          (is (= "dabears"
+                 (.getHostname syslog-message)))
+          (is (= "89"
+                 (.getProcId syslog-message)))
+          (is (= Facility/KERN
+                 (.getFacility syslog-message))) ;; instance-default
+          (is (= Severity/INFORMATIONAL
+                 (.getSeverity syslog-message))) ;; unclogged default
+
+          (is (some? syslog))
+          (is (= "localhost" (.getSyslogServerHostname syslog)))
+          (is (= 1895 (.getSyslogServerPort syslog)))
+          (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))
+          (is (.isSsl syslog)))))))
