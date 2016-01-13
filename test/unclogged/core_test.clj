@@ -315,6 +315,13 @@
 (deftest ->syslog!-tests
   (let [results (s/stream)
         source (s/stream)
+        connection-map {:host "halas"
+                        ;; port is a string to check coercion to int:
+                        :port "1895"
+                        ;; we use the tls transport because that has
+                        ;; the most interesting behavior
+                        :transport :tls
+                        :message-format :rfc-5424}
         syslog-defaults {:hostname "dabears"
                          :app-name "ditka"
                          :process-id 89
@@ -325,7 +332,7 @@
         message-details {:message "only in message"
                          :message-id "only in message"}]
     (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
-      (c/->syslog! source {} syslog-defaults)
+      (c/->syslog! source connection-map syslog-defaults)
       (s/put! source message-details)
       (let [syslog-message @(s/take! results)]
         (is (= "only in message"
