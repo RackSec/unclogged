@@ -86,7 +86,7 @@
     (when message-format
       (.setMessageFormat syslog (message-format message-format)))
     (when (#{:tls :ssl} transport)
-      (.setSsl true))
+      (.setSsl syslog true))
     syslog))
 
 (def system-defaults
