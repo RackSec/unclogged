@@ -1,4 +1,4 @@
-(defproject unclogged "0.2.0"
+(defproject unclogged "0.2.1-SNAPSHOT"
   :description "Clojure syslog abstraction"
   :url "https://github.com/RackSec/unclogged"
   :license {:name "Eclipse Public License"
