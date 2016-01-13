@@ -1,5 +1,8 @@
 (ns unclogged.core
+  (:require
+   [manifold.stream :as s])
   (:import
+   [com.cloudbees.syslog.sender TcpSyslogMessageSender UdpSyslogMessageSender]
    [com.cloudbees.syslog Facility Severity MessageFormat SyslogMessage])
   (:gen-class))
 
@@ -50,6 +53,78 @@
       (.withProcId (str process-id))
       (.withFacility (parse-facility facility))
       (.withSeverity (parse-severity severity)))))
+
+(defn ^:private make-syslog
+  "Creates an instance.
+
+  This fn exists because it's way easier to redef a Clojure fn than it
+  is to mock a Java class."
+  [transport]
+  (case transport
+    :udp (UdpSyslogMessageSender.)
+    :tcp (TcpSyslogMessageSender.)
+    ;; TLS is enabled below.
+    :tls (TcpSyslogMessageSender.)
+    :ssl (TcpSyslogMessageSender.)))
+
+(defn ^:private configured-syslog
+  "Creates a configured syslog instance.
+
+  Please note that this currently does not set any message defaults;
+  all values are always set on all syslog messages; this may be a
+  small performance hit, but helps inspectability. Ideally, our syslog
+  implementation wouldn't check for that at all, and decomplect the
+  concerns of providing defaults with the actual send-syslog-messages
+  bits."
+  [conn-details]
+  (let [{:keys [host port message-format transport]
+         :or {:transport :tls}} conn-details
+        syslog (make-syslog transport)]
+    (.setSyslogServerHostname syslog host)
+    (when port
+      (.setSyslogServerPort syslog port))
+    (when message-format
+      (.setMessageFormat syslog (message-format message-format)))
+    (when (#{:tls :ssl} transport)
+      (.setSsl true))
+    syslog))
+
+(def system-defaults
+  "Unclogged's default chocies for syslog messages."
+  {:severity Severity/INFORMATIONAL
+   :facility Facility/USER})
+
+(defn ->syslog!
+  "Consumes elems on source and sends them to syslog as specified by
+  the connection map & defaults.
+
+  Values in message maps override values in the defaults; values in
+  the defaults override unclogged's default-defaults. This prevents
+  NullPointerExceptions when you forget to provide a facility or
+  severity, for example.
+
+  Returns the source, annotated with :unclogged/syslog in its
+  metadata. This is only provided for inspection; mutating that object
+  is not guaranteed to have desired effects."
+  [source conn-details defaults]
+  (let [actual-defaults (merge system-defaults defaults)
+        syslog (configured-syslog conn-details)
+        send! (fn [message-details]
+                (->> message-details
+                     (->syslog-msg actual-defaults)
+                     (.sendMessage syslog)))]
+    (s/consume send! source)))
+
+(defn syslog-sink
+  "Returns a Manifold sink (stream) where you can dump information
+  you'd like to send to syslog. Takes a connection map and some
+  message defaults.
+
+  If you already have a manifold stream, see ->syslog!."
+  [conn-opts defaults]
+  (let [stream (s/stream)]
+    (->syslog! stream)
+    stream))
 
 (defn -main
   "I don't do a whole lot ... yet."
