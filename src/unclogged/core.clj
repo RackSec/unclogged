@@ -123,9 +123,9 @@
 
   If you already have a manifold stream, see ->syslog!."
   [conn-opts defaults]
-  (let [stream (s/stream)]
-    (->syslog! stream)
-    stream))
+  (let [sink (s/stream)]
+    (->syslog! sink conn-opts defaults)
+    sink))
 
 (defn -main
   "I don't do a whole lot ... yet."
