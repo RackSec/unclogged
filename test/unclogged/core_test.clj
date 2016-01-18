@@ -316,7 +316,8 @@
   (let [results (s/stream)
         inputs (s/stream)
         conn-opts {:host "localhost"
-                   :port 1895
+                   ;; Do we parse port -> int correctly?
+                   :port "1895"
                    ;; tls transport has the most interesting behavior
                    :transport :tls
                    :message-format :rfc-5424}
