@@ -79,7 +79,10 @@
   [conn-opts]
   (let [{:keys [host port message-format transport]
          :or {:transport :tls}} conn-opts
-        syslog (make-syslog transport)]
+        syslog (make-syslog transport)
+        port (if (string? port)
+               (Integer/parseInt port)
+               port)]
     (.setSyslogServerHostname syslog host)
     (when port
       (.setSyslogServerPort syslog port))
