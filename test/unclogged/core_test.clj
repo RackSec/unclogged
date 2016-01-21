@@ -349,7 +349,7 @@
                  (.getFacility syslog-message))) ;; instance-default
           (is (= Severity/INFORMATIONAL
                  (.getSeverity syslog-message)))) ;; unclogged default
-        (let [syslog (:unclogged/syslog (meta inputs))]
+        (let [{:keys [syslog stream]} (c/->syslog! inputs conn-opts defaults)]
           (is (some? syslog))
           (is (= "localhost" (.getSyslogServerHostname syslog)))
           (is (= 1895 (.getSyslogServerPort syslog)))
@@ -359,12 +359,12 @@
     (let [inputs (s/stream)
           conn-opts {:host "localhost"
                      :port 1895}
-      (let [syslog (:unclogged/syslog (meta inputs))]
           defaults {:hostname "dabears"
                     :app-name "ditka"
                     :process-id 89
                     :facility Facility/KERN}]
       (c/->syslog! inputs conn-opts defaults)
+      (let [{:keys [syslog stream]} (c/->syslog! inputs conn-opts defaults)]
         (is (some? syslog))
         (is (instance? TcpSyslogMessageSender syslog))
         (is (= "localhost" (.getSyslogServerHostname syslog)))
@@ -379,12 +379,12 @@
                      :port 1895
                      :transport :tcp
                      :message-format :rfc-5424}
-      (c/->syslog! inputs conn-opts syslog-defaults)
-      (let [syslog (:unclogged/syslog (meta inputs))]
           defaults {:hostname "dabears"
                     :app-name "ditka"
                     :process-id 89
                     :facility Facility/KERN}]
+      (c/->syslog! inputs conn-opts defaults)
+      (let [{:keys [syslog stream]} (c/->syslog! inputs conn-opts defaults)]
         (is (some? syslog))
         (is (instance? TcpSyslogMessageSender syslog))
         (is (= "localhost" (.getSyslogServerHostname syslog)))
@@ -397,12 +397,12 @@
                      :port 1895
                      :transport :tls
                      :message-format :rfc-5424}
-      (c/->syslog! inputs conn-opts syslog-defaults)
-      (let [syslog (:unclogged/syslog (meta inputs))]
           defaults {:hostname "dabears"
                     :app-name "ditka"
                     :process-id 89
                     :facility Facility/KERN}]
+      (c/->syslog! inputs conn-opts defaults)
+      (let [{:keys [syslog stream]} (c/->syslog! inputs conn-opts defaults)]
         (is (some? syslog))
         (is (instance? TcpSyslogMessageSender syslog))
         (is (= "localhost" (.getSyslogServerHostname syslog)))
@@ -415,12 +415,12 @@
                      :port 1895
                      :transport :ssl
                      :message-format :rfc-5424}
-      (c/->syslog! inputs conn-opts syslog-defaults)
-      (let [syslog (:unclogged/syslog (meta inputs))]
           defaults {:hostname "dabears"
                     :app-name "ditka"
                     :process-id 89
                     :facility Facility/KERN}]
+      (c/->syslog! inputs conn-opts defaults)
+      (let [{:keys [syslog stream]} (c/->syslog! inputs conn-opts defaults)]
         (is (some? syslog))
         (is (instance? TcpSyslogMessageSender syslog))
         (is (= "localhost" (.getSyslogServerHostname syslog)))
@@ -432,12 +432,11 @@
           conn-opts {:host "localhost"
                      :port 1895
                      :transport :udp}
-      (c/->syslog! inputs conn-opts syslog-defaults)
-      (let [syslog (:unclogged/syslog (meta inputs))]
           defaults {:hostname "dabears"
                     :app-name "ditka"
                     :process-id 89
                     :facility Facility/KERN}]
+      (let [{:keys [syslog stream]} (c/->syslog! inputs conn-opts defaults)]
         (is (some? syslog))
         (is (instance? UdpSyslogMessageSender syslog))
         (is (= "localhost" (.getSyslogServerHostname syslog)))
@@ -465,10 +464,9 @@
         message-details {:message "only in message"
                          :message-id "only in message"}]
     (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
-      (let [inputs (c/syslog-sink conn-opts syslog-defaults)]
-        (s/put! inputs message-details)
-        (let [syslog-message @(s/take! results)
-              syslog (:unclogged/syslog (meta inputs))]
+      (let [{:keys [syslog stream]} (c/syslog-sink conn-opts defaults)]
+        (s/put! stream message-details)
+        (let [syslog-message @(s/take! results)]
           (is (= "only in message"
                  (.toString ^CharArrayWriter (.getMsg syslog-message))))
           (is (= "only in message"
