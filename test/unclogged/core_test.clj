@@ -5,7 +5,7 @@
    [manifold.stream :as s]
    [taoensso.timbre :refer [info spy]])
   (:import
-   [com.cloudbees.syslog.sender TcpSyslogMessageSender]
+   [com.cloudbees.syslog.sender TcpSyslogMessageSender UdpSyslogMessageSender]
    [com.cloudbees.syslog Facility Severity MessageFormat SyslogMessage]
    [java.io CharArrayWriter]))
 
@@ -426,7 +426,23 @@
         (is (= "localhost" (.getSyslogServerHostname syslog)))
         (is (= 1895 (.getSyslogServerPort syslog)))
         (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))
-        (is (.isSsl syslog))))))
+        (is (.isSsl syslog)))))
+  (testing "Explicit UDP"
+    (let [inputs (s/stream)
+          conn-opts {:host "localhost"
+                     :port 1895
+                     :transport :udp}
+          syslog-defaults {:hostname "dabears"
+                           :app-name "ditka"
+                           :process-id 89
+                           :facility Facility/KERN}]
+      (c/->syslog! inputs conn-opts syslog-defaults)
+      (let [syslog (:unclogged/syslog (meta inputs))]
+        (is (some? syslog))
+        (is (instance? UdpSyslogMessageSender syslog))
+        (is (= "localhost" (.getSyslogServerHostname syslog)))
+        (is (= 1895 (.getSyslogServerPort syslog)))
+        (is (thrown? IllegalArgumentException (.isSsl syslog)))))))
 
 (deftest syslog-sink-tests
   (let [results (s/stream)
