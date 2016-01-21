@@ -364,16 +364,15 @@
                            :app-name "ditka"
                            :process-id 89
                            :facility Facility/KERN}]
-      (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
-        (c/->syslog! inputs conn-opts syslog-defaults)
-        (let [syslog (:unclogged/syslog (meta inputs))]
-          (is (some? syslog))
-          (is (= "localhost" (.getSyslogServerHostname syslog)))
-          (is (= 1895 (.getSyslogServerPort syslog)))
-          (is (= MessageFormat/RFC_3164 (.getMessageFormat syslog))
-              "default message format is RFC3164")
-          (is (.isSsl syslog)
-              "default transport is TLS"))))))
+      (c/->syslog! inputs conn-opts syslog-defaults)
+      (let [syslog (:unclogged/syslog (meta inputs))]
+        (is (some? syslog))
+        (is (= "localhost" (.getSyslogServerHostname syslog)))
+        (is (= 1895 (.getSyslogServerPort syslog)))
+        (is (= MessageFormat/RFC_3164 (.getMessageFormat syslog))
+            "default message format is RFC3164")
+        (is (.isSsl syslog)
+            "default transport is TLS")))))
 
 (deftest syslog-sink-tests
   (let [results (s/stream)
