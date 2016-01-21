@@ -313,47 +313,67 @@
     (sendMessage [msg] (s/put! results msg))))
 
 (deftest ->syslog!-tests
-  (let [results (s/stream)
-        inputs (s/stream)
-        conn-opts {:host "localhost"
-                   ;; Do we parse port -> int correctly?
-                   :port "1895"
-                   ;; tls transport has the most interesting behavior
-                   :transport :tls
-                   :message-format :rfc-5424}
-        syslog-defaults {:hostname "dabears"
-                         :app-name "ditka"
-                         :process-id 89
-                         :facility Facility/KERN}
-        ;; Above, KERN overrides unclogged default, which is USER.
-        ;; This is meant to test that message details override syslog
-        ;; client instance defaults override our package defaults.
-        message-details {:message "only in message"
-                         :message-id "only in message"}]
-    (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
-      (c/->syslog! inputs conn-opts syslog-defaults)
-      (s/put! inputs message-details)
-      (let [syslog-message @(s/take! results)]
-        (is (= "only in message"
-               (.toString ^CharArrayWriter (.getMsg syslog-message))))
-        (is (= "only in message"
-               (.getMsgId syslog-message)))
-        (is (= "ditka"
-               (.getAppName syslog-message)))
-        (is (= "dabears"
-               (.getHostname syslog-message)))
-        (is (= "89"
-               (.getProcId syslog-message)))
-        (is (= Facility/KERN
-               (.getFacility syslog-message))) ;; instance-default
-        (is (= Severity/INFORMATIONAL
-               (.getSeverity syslog-message)))) ;; unclogged default
-      (let [syslog (:unclogged/syslog (meta inputs))]
-        (is (some? syslog))
-        (is (= "localhost" (.getSyslogServerHostname syslog)))
-        (is (= 1895 (.getSyslogServerPort syslog)))
-        (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))
-        (is (.isSsl syslog))))))
+  (testing "complete example"
+    (let [results (s/stream)
+          inputs (s/stream)
+          conn-opts {:host "localhost"
+                     ;; Do we parse port -> int correctly?
+                     :port "1895"
+                     ;; tls transport has the most interesting behavior
+                     :transport :tls
+                     :message-format :rfc-5424}
+          syslog-defaults {:hostname "dabears"
+                           :app-name "ditka"
+                           :process-id 89
+                           :facility Facility/KERN}
+          ;; Above, KERN overrides unclogged default, which is USER.
+          ;; This is meant to test that message details override syslog
+          ;; client instance defaults override our package defaults.
+          message-details {:message "only in message"
+                           :message-id "only in message"}]
+      (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
+        (c/->syslog! inputs conn-opts syslog-defaults)
+        (s/put! inputs message-details)
+        (let [syslog-message @(s/take! results)]
+          (is (= "only in message"
+                 (.toString ^CharArrayWriter (.getMsg syslog-message))))
+          (is (= "only in message"
+                 (.getMsgId syslog-message)))
+          (is (= "ditka"
+                 (.getAppName syslog-message)))
+          (is (= "dabears"
+                 (.getHostname syslog-message)))
+          (is (= "89"
+                 (.getProcId syslog-message)))
+          (is (= Facility/KERN
+                 (.getFacility syslog-message))) ;; instance-default
+          (is (= Severity/INFORMATIONAL
+                 (.getSeverity syslog-message)))) ;; unclogged default
+        (let [syslog (:unclogged/syslog (meta inputs))]
+          (is (some? syslog))
+          (is (= "localhost" (.getSyslogServerHostname syslog)))
+          (is (= 1895 (.getSyslogServerPort syslog)))
+          (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))
+          (is (.isSsl syslog))))))
+  (testing "defaults, no integer port parsing"
+    (let [results (s/stream)
+          inputs (s/stream)
+          conn-opts {:host "localhost"
+                     :port 1895}
+          syslog-defaults {:hostname "dabears"
+                           :app-name "ditka"
+                           :process-id 89
+                           :facility Facility/KERN}]
+      (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
+        (c/->syslog! inputs conn-opts syslog-defaults)
+        (let [syslog (:unclogged/syslog (meta inputs))]
+          (is (some? syslog))
+          (is (= "localhost" (.getSyslogServerHostname syslog)))
+          (is (= 1895 (.getSyslogServerPort syslog)))
+          (is (= MessageFormat/RFC_3164 (.getMessageFormat syslog))
+              "default message format is RFC3164")
+          (is (.isSsl syslog)
+              "default transport is TLS"))))))
 
 (deftest syslog-sink-tests
   (let [results (s/stream)
