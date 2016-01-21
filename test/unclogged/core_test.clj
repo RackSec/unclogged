@@ -408,6 +408,24 @@
         (is (= "localhost" (.getSyslogServerHostname syslog)))
         (is (= 1895 (.getSyslogServerPort syslog)))
         (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))
+        (is (.isSsl syslog)))))
+  (testing "SSL is just an alias for TLS, explicit 5424"
+    (let [inputs (s/stream)
+          conn-opts {:host "localhost"
+                     :port 1895
+                     :transport :ssl
+                     :message-format :rfc-5424}
+          syslog-defaults {:hostname "dabears"
+                           :app-name "ditka"
+                           :process-id 89
+                           :facility Facility/KERN}]
+      (c/->syslog! inputs conn-opts syslog-defaults)
+      (let [syslog (:unclogged/syslog (meta inputs))]
+        (is (some? syslog))
+        (is (instance? TcpSyslogMessageSender syslog))
+        (is (= "localhost" (.getSyslogServerHostname syslog)))
+        (is (= 1895 (.getSyslogServerPort syslog)))
+        (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))
         (is (.isSsl syslog))))))
 
 (deftest syslog-sink-tests
