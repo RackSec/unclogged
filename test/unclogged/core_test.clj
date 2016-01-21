@@ -322,17 +322,17 @@
                      ;; tls transport has the most interesting behavior
                      :transport :tls
                      :message-format :rfc-5424}
-          syslog-defaults {:hostname "dabears"
-                           :app-name "ditka"
-                           :process-id 89
-                           :facility Facility/KERN}
+          defaults {:hostname "dabears"
+                    :app-name "ditka"
+                    :process-id 89
+                    :facility Facility/KERN}
           ;; Above, KERN overrides unclogged default, which is USER.
           ;; This is meant to test that message details override syslog
           ;; client instance defaults override our package defaults.
           message-details {:message "only in message"
                            :message-id "only in message"}]
       (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
-        (c/->syslog! inputs conn-opts syslog-defaults)
+        (c/->syslog! inputs conn-opts defaults)
         (s/put! inputs message-details)
         (let [syslog-message @(s/take! results)]
           (is (= "only in message"
@@ -359,12 +359,12 @@
     (let [inputs (s/stream)
           conn-opts {:host "localhost"
                      :port 1895}
-          syslog-defaults {:hostname "dabears"
-                           :app-name "ditka"
-                           :process-id 89
-                           :facility Facility/KERN}]
-      (c/->syslog! inputs conn-opts syslog-defaults)
       (let [syslog (:unclogged/syslog (meta inputs))]
+          defaults {:hostname "dabears"
+                    :app-name "ditka"
+                    :process-id 89
+                    :facility Facility/KERN}]
+      (c/->syslog! inputs conn-opts defaults)
         (is (some? syslog))
         (is (instance? TcpSyslogMessageSender syslog))
         (is (= "localhost" (.getSyslogServerHostname syslog)))
@@ -379,12 +379,12 @@
                      :port 1895
                      :transport :tcp
                      :message-format :rfc-5424}
-          syslog-defaults {:hostname "dabears"
-                           :app-name "ditka"
-                           :process-id 89
-                           :facility Facility/KERN}]
       (c/->syslog! inputs conn-opts syslog-defaults)
       (let [syslog (:unclogged/syslog (meta inputs))]
+          defaults {:hostname "dabears"
+                    :app-name "ditka"
+                    :process-id 89
+                    :facility Facility/KERN}]
         (is (some? syslog))
         (is (instance? TcpSyslogMessageSender syslog))
         (is (= "localhost" (.getSyslogServerHostname syslog)))
@@ -397,12 +397,12 @@
                      :port 1895
                      :transport :tls
                      :message-format :rfc-5424}
-          syslog-defaults {:hostname "dabears"
-                           :app-name "ditka"
-                           :process-id 89
-                           :facility Facility/KERN}]
       (c/->syslog! inputs conn-opts syslog-defaults)
       (let [syslog (:unclogged/syslog (meta inputs))]
+          defaults {:hostname "dabears"
+                    :app-name "ditka"
+                    :process-id 89
+                    :facility Facility/KERN}]
         (is (some? syslog))
         (is (instance? TcpSyslogMessageSender syslog))
         (is (= "localhost" (.getSyslogServerHostname syslog)))
@@ -415,12 +415,12 @@
                      :port 1895
                      :transport :ssl
                      :message-format :rfc-5424}
-          syslog-defaults {:hostname "dabears"
-                           :app-name "ditka"
-                           :process-id 89
-                           :facility Facility/KERN}]
       (c/->syslog! inputs conn-opts syslog-defaults)
       (let [syslog (:unclogged/syslog (meta inputs))]
+          defaults {:hostname "dabears"
+                    :app-name "ditka"
+                    :process-id 89
+                    :facility Facility/KERN}]
         (is (some? syslog))
         (is (instance? TcpSyslogMessageSender syslog))
         (is (= "localhost" (.getSyslogServerHostname syslog)))
@@ -432,12 +432,12 @@
           conn-opts {:host "localhost"
                      :port 1895
                      :transport :udp}
-          syslog-defaults {:hostname "dabears"
-                           :app-name "ditka"
-                           :process-id 89
-                           :facility Facility/KERN}]
       (c/->syslog! inputs conn-opts syslog-defaults)
       (let [syslog (:unclogged/syslog (meta inputs))]
+          defaults {:hostname "dabears"
+                    :app-name "ditka"
+                    :process-id 89
+                    :facility Facility/KERN}]
         (is (some? syslog))
         (is (instance? UdpSyslogMessageSender syslog))
         (is (= "localhost" (.getSyslogServerHostname syslog)))
@@ -455,10 +455,10 @@
                    ;; the most interesting behavior
                    :transport :tls
                    :message-format :rfc-5424}
-        syslog-defaults {:hostname "dabears"
-                         :app-name "ditka"
-                         :process-id 89
-                         :facility Facility/KERN}
+        defaults {:hostname "dabears"
+                  :app-name "ditka"
+                  :process-id 89
+                  :facility Facility/KERN}
         ;; Above, KERN overrides unclogged default, which is USER.
         ;; This is meant to test that message details override syslog
         ;; client instance defaults override our package defaults.
