@@ -106,9 +106,10 @@
   NullPointerExceptions when you forget to provide a facility or
   severity, for example.
 
-  Returns the source, annotated with :unclogged/syslog in its
-  metadata. This is only provided for inspection; mutating that object
-  is not guaranteed to have desired effects."
+  Returns a map containing the syslog client object under the :syslog
+  key. This is only provided for inspection; mutating that object is
+  not guaranteed to have desired effects. It also contains the input
+  stream under the :stream key."
   [source conn-opts defaults]
   (let [actual-defaults (merge system-defaults defaults)
         syslog (configured-syslog conn-opts)
@@ -116,19 +117,22 @@
                 (->> message-details
                      (->syslog-msg actual-defaults)
                      (.sendMessage syslog)))]
-    (alter-meta! source assoc :unclogged/syslog syslog)
-    (s/consume send! source)))
+    (s/consume send! source)
+    {:syslog syslog
+     :stream source}))
 
 (defn syslog-sink
-  "Returns a Manifold sink (stream) where you can dump information
+  "Builds a Manifold sink (stream) where you can dump information
   you'd like to send to syslog. Takes a connection map and some
   message defaults.
+
+  Returns a map that contains at least the built stream under
+  the :stream key.
 
   If you already have a manifold stream, see ->syslog!."
   [conn-opts defaults]
   (let [sink (s/stream)]
-    (->syslog! sink conn-opts defaults)
-    sink))
+    (->syslog! sink conn-opts defaults)))
 
 (defn -main
   "I don't do a whole lot ... yet."
