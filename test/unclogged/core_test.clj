@@ -371,7 +371,24 @@
         (is (= MessageFormat/RFC_3164 (.getMessageFormat syslog))
             "default message format is RFC3164")
         (is (.isSsl syslog)
-            "default transport is TLS")))))
+            "default transport is TLS"))))
+  (testing "TCP, explicit 5424"
+    (let [inputs (s/stream)
+          conn-opts {:host "localhost"
+                     :port 1895
+                     :transport :tcp
+                     :message-format :rfc-5424}
+          syslog-defaults {:hostname "dabears"
+                           :app-name "ditka"
+                           :process-id 89
+                           :facility Facility/KERN}]
+      (c/->syslog! inputs conn-opts syslog-defaults)
+      (let [syslog (:unclogged/syslog (meta inputs))]
+        (is (some? syslog))
+        (is (= "localhost" (.getSyslogServerHostname syslog)))
+        (is (= 1895 (.getSyslogServerPort syslog)))
+        (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))
+        (is (not (.isSsl syslog)))))))
 
 (deftest syslog-sink-tests
   (let [results (s/stream)
