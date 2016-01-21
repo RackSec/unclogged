@@ -356,8 +356,7 @@
           (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))
           (is (.isSsl syslog))))))
   (testing "defaults, no integer port parsing"
-    (let [results (s/stream)
-          inputs (s/stream)
+    (let [inputs (s/stream)
           conn-opts {:host "localhost"
                      :port 1895}
           syslog-defaults {:hostname "dabears"
