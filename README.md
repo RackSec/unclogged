@@ -28,7 +28,7 @@ A couple of reasons you might want this:
   need to set up a real syslog server; just see what comes out the other end.
 - You can also use Clojure-like shorthand for severities, facilities and the
   like, for example, you can use `:info` (short for `:informational`, the name
-  e used in the spec, which also works) or even `"INFO"` instead of having to
+  used in the spec, which also works) or even `"INFO"` instead of having to
   remember that that's severity 6.
 - You can log strings or structured messages; they'll be serialized
   appropriately regardless.
