@@ -78,7 +78,7 @@
   bits."
   [conn-opts]
   (let [{:keys [host port message-format transport]
-         :or {:transport :tls}} conn-opts
+         :or {transport :tls}} conn-opts
         syslog (make-syslog transport)
         port (if (string? port)
                (Integer/parseInt port)
