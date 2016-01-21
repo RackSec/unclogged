@@ -7,7 +7,8 @@
                  [com.cloudbees/syslog-java-client "1.0.8"]
                  [manifold "0.1.2-alpha2"]
                  [com.taoensso/timbre "4.2.0"]]
-  :plugins [[lein-cljfmt "0.3.0"]]
+  :plugins [[lein-cljfmt "0.3.0"]
+            [lein-cloverage "1.0.7-SNAPSHOT"]]
   :main ^:skip-aot unclogged.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
