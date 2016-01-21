@@ -366,6 +366,7 @@
       (c/->syslog! inputs conn-opts syslog-defaults)
       (let [syslog (:unclogged/syslog (meta inputs))]
         (is (some? syslog))
+        (is (instance? TcpSyslogMessageSender syslog))
         (is (= "localhost" (.getSyslogServerHostname syslog)))
         (is (= 1895 (.getSyslogServerPort syslog)))
         (is (= MessageFormat/RFC_3164 (.getMessageFormat syslog))
@@ -385,6 +386,7 @@
       (c/->syslog! inputs conn-opts syslog-defaults)
       (let [syslog (:unclogged/syslog (meta inputs))]
         (is (some? syslog))
+        (is (instance? TcpSyslogMessageSender syslog))
         (is (= "localhost" (.getSyslogServerHostname syslog)))
         (is (= 1895 (.getSyslogServerPort syslog)))
         (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))
