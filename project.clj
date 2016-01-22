@@ -9,7 +9,6 @@
                  [com.taoensso/timbre "4.2.0"]]
   :plugins [[lein-cljfmt "0.3.0"]
             [lein-cloverage "1.0.7-SNAPSHOT"]]
-  :main ^:skip-aot unclogged.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
   :deploy-repositories [["releases" :clojars]

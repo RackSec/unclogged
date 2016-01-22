@@ -3,8 +3,7 @@
    [manifold.stream :as s])
   (:import
    [com.cloudbees.syslog.sender TcpSyslogMessageSender UdpSyslogMessageSender]
-   [com.cloudbees.syslog Facility Severity MessageFormat SyslogMessage])
-  (:gen-class))
+   [com.cloudbees.syslog Facility Severity MessageFormat SyslogMessage]))
 
 (defn ^:private parse-facility
   [x]
@@ -133,8 +132,3 @@
   [conn-opts defaults]
   (let [sink (s/stream)]
     (->syslog! sink conn-opts defaults)))
-
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-  (println "Hello, World!"))
