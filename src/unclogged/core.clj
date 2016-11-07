@@ -1,6 +1,7 @@
 (ns unclogged.core
   (:require
-   [manifold.stream :as s])
+   [manifold.stream :as s]
+   [taoensso.timbre :refer [spy]])
   (:import
    [com.cloudbees.syslog.sender TcpSyslogMessageSender UdpSyslogMessageSender]
    [com.cloudbees.syslog Facility Severity MessageFormat SyslogMessage]))
@@ -113,9 +114,8 @@
   (let [actual-defaults (merge system-defaults defaults)
         syslog (configured-syslog conn-opts)
         send! (fn [message-details]
-                (->> message-details
-                     (->syslog-msg actual-defaults)
-                     (.sendMessage syslog)))]
+                (let [msg (->syslog-msg actual-defaults)]
+                  (.sendMessage syslog (spy msg))))]
     (s/consume send! source)
     {:syslog syslog
      :stream source}))
