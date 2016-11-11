@@ -111,11 +111,9 @@
   not guaranteed to have desired effects. It also contains the input
   stream under the :stream key."
   [source conn-opts defaults]
-  (let [actual-defaults (merge system-defaults defaults)
+  (let [->syslog-msg (partial ->syslog-msg (merge system-defaults defaults))
         syslog (configured-syslog conn-opts)
-        send! (fn [message-details]
-                (let [msg (->syslog-msg actual-defaults)]
-                  (.sendMessage syslog (spy msg))))]
+        send! (fn [msg] (.sendMessage syslog (->syslog-msg (spy msg))))]
     (s/consume send! source)
     {:syslog syslog
      :stream source}))
