@@ -92,6 +92,12 @@
       (.setSsl syslog true))
     syslog))
 
+(defn ^:private create-stream
+ [conn-opts]
+ (if-let [buffer-size (:buffer-size conn-opts)]
+  (s/stream buffer-size)
+  (s/stream)))
+
 (def system-defaults
   "Unclogged's default chocies for syslog messages."
   {:severity Severity/INFORMATIONAL
@@ -128,5 +134,5 @@
 
   If you already have a manifold stream, see ->syslog!."
   [conn-opts defaults]
-  (let [sink (s/stream)]
+  (let [sink (create-stream conn-opts)]
     (->syslog! sink conn-opts defaults)))
