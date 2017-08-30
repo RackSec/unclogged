@@ -15,6 +15,10 @@
   [n]
   (bit-shift-left n 3))
 
+(defn compose-message
+ [int]
+ (str "message-" int))
+
 (deftest facility-tests
   (testing "original enum is a fixed point"
     (are [facility]  (= facility (#'unclogged.core/parse-facility facility))
@@ -444,6 +448,7 @@
         (is (thrown? IllegalArgumentException (.isSsl syslog)))))))
 
 (deftest syslog-sink-tests
+ (testing "Basic sink setup"
   (let [results (s/stream)
         conn-opts {;; getting hostname later will call InetAddress's
                    ;; getByName, which tries to resolve. So, the host has to
@@ -487,3 +492,16 @@
           (is (= 1895 (.getSyslogServerPort syslog)))
           (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))
           (is (.isSsl syslog)))))))
+ (testing "Sink setup with customizable buffer size"
+  (let [conn-opts {:host "localhost"
+                   :port 1895
+                   :buffer-size 3
+                   :transport :tls
+                   :message-format :rfc-5424}
+        defaults {:hostname "dabears"
+                  :app-name "ditka"
+                  :process-id 89
+                  :facility Facility/KERN}
+        stream (:stream (c/syslog-sink conn-opts defaults))]
+    (dotimes [n 3] (s/put! stream (compose-message n))
+    (is (false? (realized? (s/put! stream (compose-message 4)))))))))
