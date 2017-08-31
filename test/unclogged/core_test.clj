@@ -501,7 +501,7 @@
         defaults {:hostname "dabears"
                   :app-name "ditka"
                   :process-id 89
-                  :facility Facility/KERN}
-        stream (:stream (c/syslog-sink conn-opts defaults))]
-    (dotimes [n 3] (s/put! stream (compose-message n))
-    (is (false? (realized? (s/put! stream (compose-message 4)))))))))
+                  :facility Facility/KERN}]
+     (let [{:keys [stream]} (c/syslog-sink conn-opts defaults)]
+     (dotimes [n 3] (s/put! stream (compose-message n)))
+     (is (false? @(s/put! stream (compose-message 4))))))))
