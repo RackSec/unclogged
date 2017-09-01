@@ -93,10 +93,10 @@
     syslog))
 
 (defn ^:private create-stream
- [conn-opts]
- (if-let [buffer-size (:buffer-size conn-opts)]
-  (s/stream buffer-size)
-  (s/stream)))
+  [conn-opts]
+  (if-let [buffer-size (:buffer-size conn-opts)]
+    (s/stream buffer-size)
+    (s/stream)))
 
 (def system-defaults
   "Unclogged's default chocies for syslog messages."
