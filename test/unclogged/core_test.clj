@@ -464,9 +464,9 @@
                     :app-name "ditka"
                     :process-id 89
                     :facility Facility/KERN}
-           ;; Above, KERN overrides unclogged default, which is USER.
-           ;; This is meant to test that message details override syslog
-           ;; client instance defaults override our package defaults.
+          ;; Above, KERN overrides unclogged default, which is USER.
+          ;; This is meant to test that message details override syslog
+          ;; client instance defaults override our package defaults.
           message-details {:message "only in message"
                            :message-id "only in message"}]
       (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
