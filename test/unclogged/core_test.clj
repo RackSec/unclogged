@@ -17,7 +17,8 @@
 
 (defn compose-message
   [int]
-  (str "message-" int))
+  {:message (str "only in message: " int)
+   :message-id (str "message id: " int)})
 
 (deftest facility-tests
   (testing "original enum is a fixed point"
@@ -507,5 +508,11 @@
       (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
         (let [{:keys [stream]} (c/syslog-sink conn-opts defaults)]
           (is (= buffer-size (:buffer-capacity (s/description stream))))
-          (dotimes [n 2] (s/put! stream (compose-message n)))
-          (is (false? @(s/put! stream (compose-message 3)))))))))
+
+          (dotimes [n buffer-size] (s/put! stream (compose-message n)))
+          (is (= buffer-size (:buffer-size (s/description results))))
+          (is (= 0 (:pending-puts (s/description results))))
+
+          (s/put! stream (compose-message 4))
+          (is (= buffer-size (:buffer-size (s/description results))))
+          (is (= 1 (:pending-puts (s/description results)))))))))
