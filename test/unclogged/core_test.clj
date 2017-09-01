@@ -507,5 +507,5 @@
       (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
         (let [{:keys [stream]} (c/syslog-sink conn-opts defaults)]
           (is (= buffer-size (:buffer-capacity (s/description stream))))
-          (dotimes [n 3] (s/put! stream (compose-message n)))
-          (is (false? @(s/put! stream (compose-message 4)))))))))
+          (dotimes [n 2] (s/put! stream (compose-message n)))
+          (is (false? @(s/put! stream (compose-message 3)))))))))
