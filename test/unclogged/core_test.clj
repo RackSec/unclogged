@@ -452,21 +452,21 @@
   (testing "Basic sink setup"
     (let [results (s/stream)
           conn-opts {;; getting hostname later will call InetAddress's
-                   ;; getByName, which tries to resolve. So, the host has to
-                   ;; be resolvable, or the tests fail. I wanted "halas".
+                     ;; getByName, which tries to resolve. So, the host has to
+                     ;; be resolvable, or the tests fail. I wanted "halas".
                      :host "localhost"
                      :port 1895
-                   ;; we use the tls transport because that has
-                   ;; the most interesting behavior
+                     ;; we use the tls transport because that has
+                     ;; the most interesting behavior
                      :transport :tls
                      :message-format :rfc-5424}
           defaults {:hostname "dabears"
                     :app-name "ditka"
                     :process-id 89
                     :facility Facility/KERN}
-        ;; Above, KERN overrides unclogged default, which is USER.
-        ;; This is meant to test that message details override syslog
-        ;; client instance defaults override our package defaults.
+           ;; Above, KERN overrides unclogged default, which is USER.
+           ;; This is meant to test that message details override syslog
+           ;; client instance defaults override our package defaults.
           message-details {:message "only in message"
                            :message-id "only in message"}]
       (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
