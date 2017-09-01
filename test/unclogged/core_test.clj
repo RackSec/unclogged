@@ -493,10 +493,11 @@
           (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))
           (is (.isSsl syslog)))))))
  (testing "Sink setup with customizable buffer size"
-  (let [results (s/stream 3)
-       conn-opts {:host "localhost"
+  (let [buffer-size 3
+        results (s/stream buffer-size)
+        conn-opts {:host "localhost"
                    :port 1895
-                   :buffer-size 3
+                   :buffer-size buffer-size
                    :transport :tls
                    :message-format :rfc-5424}
         defaults {:hostname "dabears"
@@ -505,5 +506,6 @@
                   :facility Facility/KERN}]
      (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
       (let [{:keys [stream]} (c/syslog-sink conn-opts defaults)]
+       (is (= buffer-size (:buffer-capacity (s/description stream))))
        (dotimes [n 3] (s/put! stream (compose-message n)))
        (is (false? @(s/put! stream (compose-message 4)))))))))
