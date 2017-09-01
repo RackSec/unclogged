@@ -93,8 +93,8 @@
     syslog))
 
 (defn ^:private create-stream
-  [conn-opts]
-  (if-let [buffer-size (:buffer-size conn-opts)]
+  [buffer-size]
+  (if buffer-size
     (s/stream buffer-size)
     (s/stream)))
 
@@ -134,5 +134,5 @@
 
   If you already have a manifold stream, see ->syslog!."
   [conn-opts defaults]
-  (let [sink (create-stream conn-opts)]
+  (let [sink (create-stream (:buffer-size conn-opts))]
     (->syslog! sink conn-opts defaults)))
