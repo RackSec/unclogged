@@ -15,6 +15,11 @@
   [n]
   (bit-shift-left n 3))
 
+(defn compose-message
+  [int]
+  {:message (str "only in message: " int)
+   :message-id (str "message id: " int)})
+
 (deftest facility-tests
   (testing "original enum is a fixed point"
     (are [facility]  (= facility (#'unclogged.core/parse-facility facility))
@@ -444,46 +449,70 @@
         (is (thrown? IllegalArgumentException (.isSsl syslog)))))))
 
 (deftest syslog-sink-tests
-  (let [results (s/stream)
-        conn-opts {;; getting hostname later will call InetAddress's
-                   ;; getByName, which tries to resolve. So, the host has to
-                   ;; be resolvable, or the tests fail. I wanted "halas".
-                   :host "localhost"
-                   :port 1895
-                   ;; we use the tls transport because that has
-                   ;; the most interesting behavior
-                   :transport :tls
-                   :message-format :rfc-5424}
-        defaults {:hostname "dabears"
-                  :app-name "ditka"
-                  :process-id 89
-                  :facility Facility/KERN}
-        ;; Above, KERN overrides unclogged default, which is USER.
-        ;; This is meant to test that message details override syslog
-        ;; client instance defaults override our package defaults.
-        message-details {:message "only in message"
-                         :message-id "only in message"}]
-    (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
-      (let [{:keys [syslog stream]} (c/syslog-sink conn-opts defaults)]
-        (s/put! stream message-details)
-        (let [syslog-message @(s/take! results)]
-          (is (= "only in message"
-                 (.toString ^CharArrayWriter (.getMsg syslog-message))))
-          (is (= "only in message"
-                 (.getMsgId syslog-message)))
-          (is (= "ditka"
-                 (.getAppName syslog-message)))
-          (is (= "dabears"
-                 (.getHostname syslog-message)))
-          (is (= "89"
-                 (.getProcId syslog-message)))
-          (is (= Facility/KERN
-                 (.getFacility syslog-message))) ;; instance-default
-          (is (= Severity/INFORMATIONAL
-                 (.getSeverity syslog-message))) ;; unclogged default
+  (testing "Basic sink setup"
+    (let [results (s/stream)
+          conn-opts {;; getting hostname later will call InetAddress's
+                     ;; getByName, which tries to resolve. So, the host has to
+                     ;; be resolvable, or the tests fail. I wanted "halas".
+                     :host "localhost"
+                     :port 1895
+                     ;; we use the tls transport because that has
+                     ;; the most interesting behavior
+                     :transport :tls
+                     :message-format :rfc-5424}
+          defaults {:hostname "dabears"
+                    :app-name "ditka"
+                    :process-id 89
+                    :facility Facility/KERN}
+          ;; Above, KERN overrides unclogged default, which is USER.
+          ;; This is meant to test that message details override syslog
+          ;; client instance defaults override our package defaults.
+          message-details {:message "only in message"
+                           :message-id "only in message"}]
+      (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
+        (let [{:keys [syslog stream]} (c/syslog-sink conn-opts defaults)]
+          (s/put! stream message-details)
+          (let [syslog-message @(s/take! results)]
+            (is (= "only in message"
+                   (.toString ^CharArrayWriter (.getMsg syslog-message))))
+            (is (= "only in message"
+                   (.getMsgId syslog-message)))
+            (is (= "ditka"
+                   (.getAppName syslog-message)))
+            (is (= "dabears"
+                   (.getHostname syslog-message)))
+            (is (= "89"
+                   (.getProcId syslog-message)))
+            (is (= Facility/KERN
+                   (.getFacility syslog-message))) ;; instance-default
+            (is (= Severity/INFORMATIONAL
+                   (.getSeverity syslog-message))) ;; unclogged default
 
-          (is (some? syslog))
-          (is (= "localhost" (.getSyslogServerHostname syslog)))
-          (is (= 1895 (.getSyslogServerPort syslog)))
-          (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))
-          (is (.isSsl syslog)))))))
+            (is (some? syslog))
+            (is (= "localhost" (.getSyslogServerHostname syslog)))
+            (is (= 1895 (.getSyslogServerPort syslog)))
+            (is (= MessageFormat/RFC_5424 (.getMessageFormat syslog)))
+            (is (.isSsl syslog)))))))
+  (testing "Sink setup with customizable buffer size"
+    (let [buffer-size 3
+          results (s/stream buffer-size)
+          conn-opts {:host "localhost"
+                     :port 1895
+                     :buffer-size buffer-size
+                     :transport :tls
+                     :message-format :rfc-5424}
+          defaults {:hostname "dabears"
+                    :app-name "ditka"
+                    :process-id 89
+                    :facility Facility/KERN}]
+      (with-redefs [unclogged.core/make-syslog (partial fake-tcp-syslog results)]
+        (let [{:keys [stream]} (c/syslog-sink conn-opts defaults)]
+          (is (= buffer-size (:buffer-capacity (s/description stream))))
+
+          (dotimes [n buffer-size] (s/put! stream (compose-message n)))
+          (is (= buffer-size (:buffer-size (s/description results))))
+          (is (= 0 (:pending-puts (s/description results))))
+
+          (s/put! stream (compose-message 4))
+          (is (= buffer-size (:buffer-size (s/description results))))
+          (is (= 1 (:pending-puts (s/description results)))))))))
